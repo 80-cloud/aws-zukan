@@ -14,6 +14,16 @@ function Chips({ ids }: { ids: string[] }) {
   if (!ids?.length) return <span className="text-gray-400">—</span>
   return <div className="flex flex-wrap gap-2">{ids.map(id => <Link key={id} to={`/service/${id}`} className="rounded-full border border-gray-200 px-2 py-0.5 text-xs hover:bg-gray-50">{id}</Link>)}</div>
 }
+// 実在する service id だけリンク化し、説明文（実在しない文字列）はただのテキストとして表示する。
+// alternatives は service id ではなく説明文（"ECS/Fargate + ALB" 等）が混在するため、壊れリンクを防ぐ。
+function RefChips({ items }: { items: string[] }) {
+  if (!items?.length) return <span className="text-gray-400">—</span>
+  return <div className="flex flex-wrap gap-2">{items.map((item, i) => (
+    zukanRepository.getService(item)
+      ? <Link key={i} to={`/service/${item}`} className="rounded-full border border-gray-200 px-2 py-0.5 text-xs hover:bg-gray-50">{item}</Link>
+      : <span key={i} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{item}</span>
+  ))}</div>
+}
 export default function PatternDetail() {
   const { id } = useParams()
   const p = id ? zukanRepository.getPattern(id) : null
@@ -47,7 +57,7 @@ export default function PatternDetail() {
         {p.antiPatterns?.length ? <ul className="space-y-2">{p.antiPatterns.map((a,i) => <li key={i} className="rounded-md bg-rose-50 p-3"><div className="text-xs text-gray-500">{a.stack.join(' + ')}</div><p>{a.why}</p></li>)}</ul> : <span className="text-gray-400">—</span>}
       </Section>
       {p.optional?.length ? <Section title="任意の上積み"><Bullets items={p.optional} /></Section> : null}
-      <Section title="代替案"><Chips ids={p.alternatives} /></Section>
+      <Section title="代替案"><RefChips items={p.alternatives} /></Section>
       {p.realWorldNotes?.length ? <Section title="一次体験ノート（出典つき）"><ul className="space-y-2">{p.realWorldNotes.map((n,i) => <li key={i} className="rounded-md bg-amber-50 p-3"><p>{n.gotcha}</p><a href={n.source} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">出典</a></li>)}</ul></Section> : null}
       {p.notes ? <Section title="備考"><p>{p.notes}</p></Section> : null}
     </article>
