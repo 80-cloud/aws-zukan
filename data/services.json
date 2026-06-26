@@ -292,5 +292,97 @@
     "realWorldNotes": [
       { "source": "https://qiita.com/80-cloud/items/8fc94b79119fa3c8db38", "gotcha": "アラームを編集すると「通知」と「自動復旧(EC2 アクション)」のアクションが片方ずつ消えることがある。編集後はアクションが両方残っているか確認する。" }
     ]
+  },
+  {
+    "id": "cloudfront",
+    "name": "Amazon CloudFront",
+    "category": "networking",
+    "oneLiner": "世界中のエッジから低遅延でコンテンツを配信する CDN。静的・動的・動画配信に。",
+    "mainUseCases": ["静的サイト/SPA の高速配信", "API・動的コンテンツの高速化", "動画のストリーミング配信"],
+    "notSuitableFor": ["単一リージョン内部だけの通信", "毎回固有でキャッシュが効かない応答中心の処理"],
+    "productionPrereqs": ["HTTPS 用 ACM 証明書を us-east-1 で発行（CloudFront の制約）", "オリジンへの直接アクセス制限（OAC 等）", "アクセスログ"],
+    "commonRuleRefs": ["logging", "encryption"],
+    "cost": { "freeTier": true, "meteredAxes": ["転送量", "リクエスト数"], "relative": "中" },
+    "costGotcha": "キャッシュヒット率が低いとオリジンへの転送が増え、転送量課金が膨らみやすい。",
+    "companions": [
+      { "serviceId": "s3", "role": "配信オリジン" },
+      { "serviceId": "acm", "role": "TLS 証明書" },
+      { "serviceId": "route53", "role": "DNS" }
+    ],
+    "related": ["s3", "route53", "acm"],
+    "alternatives": [],
+    "difficulty": { "tech": 2, "ops": 2, "org": 1 },
+    "links": { "overview": "https://aws.amazon.com/cloudfront/", "pricing": "https://aws.amazon.com/cloudfront/pricing/" },
+    "tier": 1,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "adoption": { "region": { "tokyo": true }, "sla": "高い可用性の SLA を持つ（グローバルなエッジ網で配信）。", "lockin": "中", "modernizeTo": [] },
+    "ops": {
+      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "backup": "ディストリビューション設定は IaC でコード管理する。配信物のバックアップはオリジン側（S3 等）で行う。",
+      "changeImpact": "設定変更後、エッジへの反映に時間がかかることがある。",
+      "failover": "オリジングループで複数オリジンへのフェイルオーバーを構成できる。"
+    },
+    "realWorldNotes": []
+  },
+  {
+    "id": "route53",
+    "name": "Amazon Route 53",
+    "category": "networking",
+    "oneLiner": "DNS とトラフィックルーティングのマネージドサービス。名前解決・ヘルスチェック・ドメイン登録に。",
+    "mainUseCases": ["独自ドメインの名前解決", "ヘルスチェックとフェイルオーバールーティング", "レイテンシ/加重などのルーティングポリシー", "ドメイン登録"],
+    "notSuitableFor": ["DNS 以外の汎用的なキー値管理", "アプリ内部のサービスディスカバリ専用途"],
+    "productionPrereqs": ["ヘルスチェック", "レコードの IaC 管理"],
+    "commonRuleRefs": ["logging"],
+    "cost": { "freeTier": false, "meteredAxes": ["ホストゾーン数", "クエリ数"], "relative": "低" },
+    "companions": [
+      { "serviceId": "cloudfront", "role": "配信先" },
+      { "serviceId": "alb", "role": "ルーティング先" }
+    ],
+    "related": ["cloudfront", "alb"],
+    "alternatives": [],
+    "difficulty": { "tech": 1, "ops": 1, "org": 1 },
+    "links": { "overview": "https://aws.amazon.com/route53/", "pricing": "https://aws.amazon.com/route53/pricing/" },
+    "tier": 1,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "adoption": { "region": { "tokyo": true }, "sla": "非常に高い可用性の SLA を掲げる DNS サービス。", "lockin": "低", "modernizeTo": [] },
+    "ops": {
+      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "backup": "レコードは IaC でコード管理する。",
+      "changeImpact": "レコード変更は TTL に応じて伝播に時間がかかる。",
+      "failover": "ヘルスチェックと組み合わせたフェイルオーバールーティングが可能。"
+    },
+    "realWorldNotes": []
+  },
+  {
+    "id": "acm",
+    "name": "AWS Certificate Manager",
+    "category": "security",
+    "oneLiner": "SSL/TLS 証明書の発行・管理・自動更新を行うサービス。パブリック証明書は無料。",
+    "mainUseCases": ["CloudFront/ALB/API Gateway の HTTPS 化", "証明書の自動更新", "プライベート証明書の発行（PCA）"],
+    "notSuitableFor": ["AWS 統合先以外への証明書持ち出し（パブリック証明書は秘密鍵を取り出せない）"],
+    "productionPrereqs": ["DNS 検証（自動更新のため）", "CloudFront 用は us-east-1 で発行"],
+    "commonRuleRefs": ["encryption"],
+    "cost": { "freeTier": true, "meteredAxes": ["プライベート CA(PCA) 利用時のみ"], "relative": "低" },
+    "companions": [
+      { "serviceId": "cloudfront", "role": "証明書の利用先" },
+      { "serviceId": "alb", "role": "証明書の利用先" }
+    ],
+    "related": ["cloudfront", "alb"],
+    "alternatives": [],
+    "difficulty": { "tech": 1, "ops": 1, "org": 1 },
+    "links": { "overview": "https://aws.amazon.com/certificate-manager/", "pricing": "https://aws.amazon.com/certificate-manager/pricing/" },
+    "tier": 1,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "adoption": { "region": { "tokyo": true }, "sla": "", "lockin": "中", "modernizeTo": [] },
+    "ops": {
+      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "backup": "証明書はマネージドで自動更新される。設定は IaC 管理。",
+      "changeImpact": "証明書の差し替えは利用先（CloudFront/ALB）への再関連付けが要る。",
+      "failover": ""
+    },
+    "realWorldNotes": []
   }
 ]
