@@ -12,5 +12,12 @@ export interface Service {
   adoption?: ServiceAdoption; ops?: ServiceOps; links?: Record<string, string>
   realWorldNotes?: RealWorldNote[]; updatedAt?: string; verifiedAt?: string
 }
-export interface Pattern { id: string; name: string; goal: string }
+export interface AntiPattern { stack: string[]; why: string; source?: string | null }
+export interface PatternEvaluation { security?: string; availability?: string; opsLoad?: string; cost?: string; scalability?: string; governanceFit?: string; migrationEase?: string; vendorLockin?: string; [k: string]: string | undefined }
+export interface Pattern {
+  id: string; name: string; goal: string; recommendedStack: string[]; rationale: string
+  antiPatterns: AntiPattern[]; requiredGovernance: string[]; optional: string[]
+  suitableConditions: string[]; alternatives: string[]; notes?: string; difficulty: number
+  evaluation: PatternEvaluation; scenarioTags: string[]; realWorldNotes?: RealWorldNote[]
+}
 export interface CommonRule { key: string; title: string; body: string }
