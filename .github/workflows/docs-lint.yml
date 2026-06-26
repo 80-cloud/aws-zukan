@@ -17,7 +17,15 @@ jobs:
             echo "✘ *.local.* が追跡対象です。"; exit 1
           fi
           echo "✓ *.local.* は追跡されていない"
-      - name: 用語スキャン（CI には語ファイルが無いので補助的）
+      - name: 用語スキャン（Secret から語リストを復元してフル検査）
+        env:
+          DOCS_LINT_WORDS: ${{ secrets.DOCS_LINT_WORDS }}
         run: |
+          if [ -n "${DOCS_LINT_WORDS}" ]; then
+            printf '%s\n' "${DOCS_LINT_WORDS}" > scripts/docs-lint-words.local.txt
+            echo "語リスト復元: $(grep -vcE '^#|^$' scripts/docs-lint-words.local.txt) 語"
+          else
+            echo "⚠ Secret DOCS_LINT_WORDS 未設定 — 語スキャンは *.local.* ガードのみ"
+          fi
           chmod +x scripts/docs-lint.sh
           bash scripts/docs-lint.sh
