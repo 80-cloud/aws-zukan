@@ -9,5 +9,6 @@ export const zukanRepository = {
   listServices: (): Service[] => services,
   getService: (id: string): Service | null => services.find(s => s.id === id) ?? null,
   listPatterns: (): Pattern[] => patterns,
+  getPattern: (id: string): Pattern | null => patterns.find(p => p.id === id) ?? null,
   listCommonRules: (): CommonRule[] => commonRules,
 }
