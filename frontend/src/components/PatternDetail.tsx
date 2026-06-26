@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { zukanRepository } from '../api/zukanRepository'
+import { buildReviewChecklist } from '../lib/reviewChecklist'
 const AXES: [string, string][] = [['security','安全性'],['availability','可用性'],['opsLoad','運用負荷'],['cost','コスト'],['scalability','拡張性'],['governanceFit','統制適合'],['migrationEase','移行容易'],['vendorLockin','ベンダー依存']]
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return <section className="mt-6"><h2 className="text-sm font-semibold text-gray-500">{title}</h2><div className="mt-2 text-sm text-gray-800">{children}</div></section>
@@ -17,6 +18,7 @@ export default function PatternDetail() {
   const { id } = useParams()
   const p = id ? zukanRepository.getPattern(id) : null
   if (!p) return <div><p className="text-gray-700">構成パターンが見つかりませんでした。</p><Link to="/patterns" className="text-sm text-blue-600 hover:underline">← 一覧へ</Link></div>
+  const checklist = buildReviewChecklist(p)
   return (
     <article>
       <Link to="/patterns" className="text-sm text-blue-600 hover:underline">← 構成パターン一覧へ</Link>
@@ -28,6 +30,16 @@ export default function PatternDetail() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-4">
           {AXES.map(([k,label]) => <div key={k} className="flex justify-between border-b border-gray-100 py-1"><span className="text-gray-500">{label}</span><span className="font-semibold">{p.evaluation?.[k] ?? '—'}</span></div>)}
         </div>
+      </Section>
+      <Section title="設計レビュー観点（既存データから自動生成）">
+        <ul className="space-y-1">
+          {checklist.map((c,i) => (
+            <li key={i} className="flex gap-2">
+              <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">{c.kind}</span>
+              <span>{c.text}</span>
+            </li>
+          ))}
+        </ul>
       </Section>
       <Section title="向いている条件"><Bullets items={p.suitableConditions} /></Section>
       <Section title="必要な統制"><Bullets items={p.requiredGovernance} /></Section>
