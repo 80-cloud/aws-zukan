@@ -1,0 +1,26 @@
+# 作業メモ（*.local.md）と非公開語リスト（*.local.txt）は公開しない。先頭2行は消さない。
+*.local.md
+*.local.txt
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+
+# 環境ファイル
+.env
+.env.*
+!.env.example
+
+# ビルド・依存・ログ
+node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# バックアップ
+*.bak
+*.bak.*
+.tmp-*/

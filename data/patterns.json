@@ -1,0 +1,113 @@
+[
+  {
+    "id": "pat-static-site",
+    "name": "静的サイト/LP/ドキュメントの公開",
+    "goal": "サーバー処理が不要な、ファイル配信中心のサイトを公開する",
+    "recommendedStack": ["s3", "cloudfront", "route53", "acm"],
+    "rationale": "常時稼働サーバーを持たず、配信は CDN に任せる。OS パッチや監視の負担が小さい。",
+    "antiPatterns": [
+      { "stack": ["ec2"], "why": "この要件では EC2 上に Web サーバーを置くと、OS パッチ・監視・スケールの運用負荷が相対的に高い。", "source": null }
+    ],
+    "requiredGovernance": ["HTTPS", "CloudFront 経由のみのアクセス", "アクセスログ"],
+    "optional": ["WAF", "CI/CD", "監視通知"],
+    "suitableConditions": ["動的なサーバー処理が不要", "更新がファイル配信中心"],
+    "alternatives": ["Amplify Hosting", "コンテナ/EC2 上の Web サーバー"],
+    "notes": "認証付き画面や動的 API は別途設計が必要。",
+    "difficulty": 1,
+    "evaluation": { "security": "○", "availability": "◎", "opsLoad": "◎", "cost": "◎", "scalability": "○", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
+    "scenarioTags": ["外部公開サイト", "コーポレートサイト/LP", "ドキュメントサイト"],
+    "realWorldNotes": []
+  },
+  {
+    "id": "pat-alb-frontend",
+    "name": "ALB で EC2 アプリを公開",
+    "goal": "VPC 内の EC2 アプリ(Spring Boot 等)をインターネットに公開する",
+    "recommendedStack": ["alb", "ec2", "vpc", "securitygroup"],
+    "rationale": "ALB を前段に置き HTTPS 終端と複数 AZ 分散を担う。EC2 への直接 SSH は開けず、ALB の SG からのみアプリポートを許可する。",
+    "antiPatterns": [
+      { "stack": ["alb"], "why": "public サブネットが 1 AZ にしかないと、インターネット向け ALB の「2 AZ に public サブネット」要件を満たせず作成できない。", "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5" },
+      { "stack": ["ec2", "securitygroup"], "why": "SSH(22) を 0.0.0.0/0 で開けるのは総当たりの標的になる。ALB 経由なら SSH は不要で開けない。", "source": "https://qiita.com/80-cloud/items/f8f04de4a9206f8ffa95" }
+    ],
+    "requiredGovernance": ["2 AZ に public サブネット", "ALB で HTTPS 終端", "アプリポートは ALB の SG からのみ許可", "SSH は開けない/絞る"],
+    "optional": ["WAF", "アクセスログ", "Auto Scaling"],
+    "suitableConditions": ["常時稼働する動的アプリ", "VPC 内に EC2 がある"],
+    "alternatives": ["CloudFront + S3(静的のみ)", "ECS/Fargate + ALB"],
+    "notes": "鍵名の直書きは避け、パラメータ化する（環境を選ばなくなる）。",
+    "difficulty": 3,
+    "evaluation": { "security": "○", "availability": "◎", "opsLoad": "△", "cost": "○", "scalability": "○", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
+    "scenarioTags": ["外部公開アプリ", "オンプレ移行"],
+    "stackRoles": [
+      { "serviceId": "alb", "role": "ロードバランサ・HTTPS 終端" },
+      { "serviceId": "ec2", "role": "アプリ実行" },
+      { "serviceId": "vpc", "role": "ネットワーク（public/private）" },
+      { "serviceId": "securitygroup", "role": "通信制御（ALB→EC2）" }
+    ],
+    "realWorldNotes": [
+      { "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5", "gotcha": "「サブネットを作ってある」と「2 AZ に public サブネットがある」は別物。2 つ目の AZ に public サブネット(IGW 経路つき)を足して解決した。" }
+    ]
+  },
+  {
+    "id": "pat-rds-access",
+    "name": "RDS への安全な接続",
+    "goal": "アプリの DB(RDS)を、外から触れないように隔離しつつ EC2 から使う",
+    "recommendedStack": ["rds", "ec2", "vpc", "securitygroup"],
+    "rationale": "RDS を private サブネットに「パブリックアクセスなし」で置き、許可元を EC2 の SG にする。DB へは VPC 内の EC2 を経由して接続する。",
+    "antiPatterns": [
+      { "stack": ["rds"], "why": "パブリックアクセスを有効にして外から直結できるようにすると、攻撃面が広がる。隔離の利点を失う。", "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06" }
+    ],
+    "requiredGovernance": ["private サブネット配置", "パブリックアクセスなし", "許可元は EC2 の SG", "DB ポート(5432/3306)のみ許可"],
+    "optional": ["自動バックアップ", "マルチ AZ"],
+    "suitableConditions": ["アプリが VPC 内の EC2 で動く"],
+    "alternatives": ["踏み台/Session Manager 経由の運用接続"],
+    "notes": "手元の Mac から直結できない(タイムアウト)のは正常。隔離が効いているサイン。",
+    "difficulty": 2,
+    "evaluation": { "security": "◎", "availability": "○", "opsLoad": "○", "cost": "○", "scalability": "○", "governanceFit": "◎", "migrationEase": "○", "vendorLockin": "△" },
+    "scenarioTags": ["オンプレ移行", "DB の隔離"],
+    "realWorldNotes": [
+      { "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06", "gotcha": "許可元を IP でなく SG にすると、EC2 の IP が変わってもルールを直さずに済む。" }
+    ]
+  },
+  {
+    "id": "pat-tf-state",
+    "name": "Terraform のリモート state 管理（bootstrap）",
+    "goal": "Terraform の state をチームで共有し、同時 apply の事故を防ぐ",
+    "recommendedStack": ["s3", "dynamodb"],
+    "rationale": "state 置き場(S3)を作るための state をどこに置くか、という鶏と卵を、置き場だけを作る小さな bootstrap スタック(ローカル state)で先に解消する。",
+    "antiPatterns": [
+      { "stack": ["s3"], "why": "本体コードにいきなり「S3 を backend に使う」と書くと、その S3 がまだ無いため初回が成り立たず詰む(鶏と卵)。", "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4" }
+    ],
+    "requiredGovernance": ["置き場 S3 はバージョニング/暗号化/パブリックアクセス遮断", "同時 apply を防ぐロック", "bootstrap で作った置き場は destroy で壊さない"],
+    "optional": [],
+    "suitableConditions": ["複数人で Terraform を共有する", "state を安全に保管したい"],
+    "alternatives": ["Terraform Cloud 等のマネージド backend"],
+    "notes": "ロック方式はバージョンで変わる。DynamoDB ロックは非推奨化しつつあり、S3 ネイティブロック(use_lockfile)が使える場合がある。新規は公式の現行推奨を確認する。",
+    "difficulty": 2,
+    "evaluation": { "security": "○", "availability": "○", "opsLoad": "○", "cost": "◎", "scalability": "○", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
+    "scenarioTags": ["チーム開発基盤", "IaC 導入"],
+    "realWorldNotes": [
+      { "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4", "gotcha": "bootstrap はローカル state のまま置き場(S3)だけ作り、その後に本体へ backend を書いてリモート state へ移行する。" }
+    ]
+  },
+  {
+    "id": "pat-ec2-deploy",
+    "name": "EC2 への自動デプロイ（手元ビルド→ECR→pull）",
+    "goal": "terraform apply 1 発に近い形で、EC2 へアプリを自動デプロイする",
+    "recommendedStack": ["ec2", "ecr", "iam"],
+    "rationale": "重いビルドは手元でやり、ECR に push。EC2 は起動時に IAM ロールの一時資格で ECR から pull して動かすだけにする。",
+    "antiPatterns": [
+      { "stack": ["ec2"], "why": "EC2 の中でビルドすると、小さいインスタンスでメモリ不足になりやすい。", "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8" },
+      { "stack": ["iam"], "why": "ECR pull 用のアクセスキーを user_data に直書きするのは危険。長期キーを機械に置かない。", "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8" }
+    ],
+    "requiredGovernance": ["EC2 には IAM ロールで一時資格を配る", "イメージは EC2 のアーキ(amd64)で焼く", "アクセスキーを直書きしない"],
+    "optional": ["Docker Compose で DB 同居", "CI からの push 自動化"],
+    "suitableConditions": ["コンテナ化済みのアプリ", "勉強用/小規模の自動デプロイ"],
+    "alternatives": ["ECS/Fargate", "Ec2 上で都度ビルド(非推奨)"],
+    "notes": "コンテナ内の localhost は別コンテナの DB に届かない。compose のサービス名(db 等)を宛先にする。",
+    "difficulty": 3,
+    "evaluation": { "security": "○", "availability": "○", "opsLoad": "○", "cost": "○", "scalability": "△", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
+    "scenarioTags": ["勉強用デプロイ", "オンプレ移行"],
+    "realWorldNotes": [
+      { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "一周目に手作業で踏んだ罠(arm64/amd64・localhost・鍵)を、二周目は user_data の自動化で先回りして全部避けた。" }
+    ]
+  }
+]

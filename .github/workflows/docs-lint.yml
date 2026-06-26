@@ -1,0 +1,23 @@
+name: Docs Lint
+# PR と main への push 時に、公開ドキュメントの用語・命名規律を検証する。
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+jobs:
+  lint:
+    name: 用語・命名チェック
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 非公開ファイル(*.local.*) が追跡されていないか
+        run: |
+          if git -c core.quotepath=false ls-files | grep -E '\.local\.(md|txt)$'; then
+            echo "✘ *.local.* が追跡対象です。"; exit 1
+          fi
+          echo "✓ *.local.* は追跡されていない"
+      - name: 用語スキャン（CI には語ファイルが無いので補助的）
+        run: |
+          chmod +x scripts/docs-lint.sh
+          bash scripts/docs-lint.sh
