@@ -405,6 +405,10 @@
       {
         "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4",
         "gotcha": "Terraform の state ロックに使う構成は従来一般的だったが、バージョンによっては S3 ネイティブのロック(use_lockfile)が使え、DynamoDB ロックは非推奨になりつつある。新規は公式の現行推奨を確認する。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WhyDynamoDB.html",
+        "gotcha": "DynamoDB は schemaless な key-value / ドキュメント型の NoSQL で、アクセスパターンが事前に決まる用途に向く。ad hoc クエリ・データウェアハウス・OLAP や複数テーブルにまたがる結合は不得意で、任意条件の集計や全文検索が必要なら関係DB（Aurora など）が向く。「サーバーレスだから何でも DynamoDB」と決めずに、関係機能が要るかで選ぶ。"
       }
     ]
   },
@@ -839,6 +843,10 @@
       {
         "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GeneratingCustomErrorResponses.html",
         "gotcha": "S3＋CloudFront で SPA を配信し、存在しないパスでも index.html を返したい場合は、カスタムエラーレスポンスで該当ステータス→/index.html・レスポンスコード 200 に変換する。OAC＋非公開バケットでは存在しないキーが 404 でなく 403 で返ることがあるため、変換対象のコードを実際の応答に合わせる。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-custom-origin.html",
+        "gotcha": "Origin Protocol Policy を HTTPS Only にしないと、CloudFront とカスタムオリジン（ELB や EC2）の間が HTTP 平文で流れることがある（Match Viewer は閲覧者のプロトコル次第で HTTP になる）。Cookie や JWT が経路上で露出しうるので、本番前に HTTPS Only に設定し、オリジン側に証明書（ELB オリジンなら ACM）を用意する。"
       }
     ]
   },
@@ -1366,7 +1374,12 @@
       "overview": "https://aws.amazon.com/rds/aurora/",
       "pricing": "https://aws.amazon.com/rds/aurora/pricing/"
     },
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2-auto-pause.html",
+        "gotcha": "Aurora Serverless v2 は最小容量を 0 ACU にすると無接続時に自動休止し、コンピュート課金が止まる（コスト削減）。ただし休止からの復帰は最初の接続で概ね15秒ほどかかり、24時間を超える休止だと30秒以上になることがある。性能（P95 など）は復帰時間込みで計測し、クライアントの接続タイムアウトを15秒以上に延ばして接続リトライを入れる。"
+      }
+    ],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
   },
@@ -1786,7 +1799,12 @@
       "overview": "https://aws.amazon.com/cloudformation/",
       "pricing": "https://aws.amazon.com/cloudformation/pricing/"
     },
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stack-failure-options.html",
+        "gotcha": "既定ではスタック作成が失敗すると自動でロールバックされ、成功していたリソースも削除される。残したい場合は「Preserve successfully provisioned resources」（CLI では --disable-rollback / on-failure DO_NOTHING）を明示する。何が原因で消えたかはスタックの events を見ないと分からないので、失敗時はまず events を確認する。"
+      }
+    ],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
   },
