@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { zukanRepository } from '../api/zukanRepository'
 import { useFavorites } from '../lib/favorites'
+import { needsReview } from '../lib/freshness'
 
 const CATEGORY_LABELS: Record<string, string> = {
   compute: 'コンピューティング', storage: 'ストレージ', database: 'データベース',
@@ -21,12 +22,14 @@ export default function ServiceList() {
   const [cat, setCat] = useState('all')
   const [freeOnly, setFreeOnly] = useState(false)
   const [onlyFav, setOnlyFav] = useState(false)
+  const [reviewOnly, setReviewOnly] = useState(false)
 
   const categories = Array.from(new Set(all.map(s => s.category)))
   const filtered = all.filter(s => {
     if (cat !== 'all' && s.category !== cat) return false
     if (freeOnly && !s.cost?.freeTier) return false
     if (onlyFav && !isFavorite(s.id)) return false
+    if (reviewOnly && !needsReview(s.verifiedAt)) return false
     if (q) {
       const t = q.toLowerCase()
       if (!s.name.toLowerCase().includes(t) && !s.oneLiner.toLowerCase().includes(t)) return false
@@ -53,6 +56,7 @@ export default function ServiceList() {
           ))}
           <label className="ml-2 flex items-center gap-1 text-gray-600"><input type="checkbox" checked={freeOnly} onChange={e => setFreeOnly(e.target.checked)} /> 無料枠あり</label>
           <label className="flex items-center gap-1 text-gray-600"><input type="checkbox" checked={onlyFav} onChange={e => setOnlyFav(e.target.checked)} /> お気に入り</label>
+          <label className="flex items-center gap-1 text-gray-600"><input type="checkbox" checked={reviewOnly} onChange={e => setReviewOnly(e.target.checked)} /> 要確認のみ</label>
         </div>
         <p className="text-sm text-gray-500">{filtered.length} 件該当</p>
       </div>
@@ -66,7 +70,7 @@ export default function ServiceList() {
                 <Link to={`/service/${s.id}`} className="block rounded-lg border border-gray-200 p-4 pr-12 hover:border-gray-400 hover:bg-gray-50">
                   <div className="flex items-baseline justify-between">
                     <span className="font-semibold">{s.name}</span>
-                    <span className="text-xs text-gray-400">Tier {s.tier}{s.cost?.freeTier ? ' / 無料枠' : ''}</span>
+                    <span className="text-xs text-gray-400">{needsReview(s.verifiedAt) && <span className="mr-2 rounded bg-amber-100 px-1.5 py-0.5 text-amber-700">要確認</span>}Tier {s.tier}{s.cost?.freeTier ? ' / 無料枠' : ''}</span>
                   </div>
                   <p className="mt-1 text-sm text-gray-700">{s.oneLiner}</p>
                 </Link>
