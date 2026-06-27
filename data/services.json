@@ -7494,5 +7494,308 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "mgn",
+    "name": "AWS Application Migration Service (MGN)",
+    "category": "management",
+    "oneLiner": "物理/仮想/クラウドのサーバーをそのまま AWS（EC2）へ移行する lift-and-shift（リホスト）の自動化サービス（現在は AWS Transform の一部）。",
+    "mainUseCases": [
+      "既存サーバー群の AWS への一括 lift-and-shift 移行",
+      "互換性問題や長い切替を避けた移行",
+      "移行後に AWS 上で段階的にモダナイズ"
+    ],
+    "notSuitableFor": [
+      "データベースのスキーマ変換を伴う移行（それは DMS）",
+      "ファイル/オブジェクトのコピー同期そのもの（それは DataSync）"
+    ],
+    "productionPrereqs": [
+      "移行元サーバーへのレプリケーションエージェント",
+      "移行先の VPC/サブネット/IAM",
+      "テスト・カットオーバーの計画"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "レプリケーション中のサーバー数・期間"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "ec2",
+      "dms",
+      "datasync"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/mgn/latest/ug/what-is-application-migration-service.html",
+      "pricing": "https://aws.amazon.com/application-migration-service/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "cloudhsm",
+    "name": "AWS CloudHSM",
+    "category": "security",
+    "oneLiner": "鍵を完全に自分で管理する専有（シングルテナント）のハードウェアセキュリティモジュール（HSM）。FIPS 140 level 3 準拠の暗号処理を自前で行う。",
+    "mainUseCases": [
+      "規制要件で鍵の専有・完全管理が必須のケース",
+      "PKCS#11/JCE/CNG 等を使う既存暗号基盤の移行",
+      "独自アルゴリズム/鍵長が要る暗号処理"
+    ],
+    "notSuitableFor": [
+      "マネージドな鍵管理で十分な場合（それは KMS）",
+      "運用負荷を抑えたい一般用途（HSM 運用の責任が利用者側に増える）"
+    ],
+    "productionPrereqs": [
+      "VPC とサブネット・複数 AZ の HSM クラスタ",
+      "ユーザー/鍵の自己管理体制",
+      "FIPS / 非FIPS モードの選定"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "HSM インスタンスの稼働時間"
+      ],
+      "relative": "高"
+    },
+    "related": [
+      "kms",
+      "acm",
+      "secretsmanager"
+    ],
+    "alternatives": [
+      "kms"
+    ],
+    "difficulty": {
+      "tech": 4,
+      "ops": 3,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html",
+      "pricing": "https://aws.amazon.com/cloudhsm/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "lakeformation",
+    "name": "AWS Lake Formation",
+    "category": "analytics",
+    "oneLiner": "S3 上のデータレイクと Glue データカタログに対し、列・行・セル単位の細かいアクセス制御を一元管理するサービス。",
+    "mainUseCases": [
+      "データレイクの集中ガバナンス（列/行/セル単位の権限）",
+      "タグベース（LF-Tags）での大規模な権限管理",
+      "アカウント横断のデータ共有"
+    ],
+    "notSuitableFor": [
+      "データの保存そのもの（実体は S3／カタログは Glue）",
+      "単純な S3 バケットポリシーで足りる小規模用途"
+    ],
+    "productionPrereqs": [
+      "S3 データレイクと Glue データカタログ",
+      "Lake Formation 権限モデルの設計",
+      "利用する分析サービス（Athena/Redshift/EMR 等）"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "Lake Formation 自体は概ね無料（背後の Glue/S3/分析に課金）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "glue",
+      "s3",
+      "athena",
+      "redshift"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/lake-formation/latest/dg/what-is-lake-formation.html",
+      "pricing": "https://aws.amazon.com/lake-formation/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "outposts",
+    "name": "AWS Outposts",
+    "category": "compute",
+    "oneLiner": "AWS のインフラ・サービス・API をオンプレミス（顧客施設）に延伸するフルマネージドなハードウェア（ラック/サーバー）。EC2/EBS/RDS 等を構内で動かす。",
+    "mainUseCases": [
+      "低レイテンシ・データ所在地要件で AWS を構内に置く",
+      "オンプレと同じ AWS API での一貫した開発/運用",
+      "リージョンと連携したハイブリッド構成"
+    ],
+    "notSuitableFor": [
+      "クラウド完結で十分な一般用途（その場合は通常のリージョン）",
+      "小規模・短期の用途（物理ハードの契約が前提）"
+    ],
+    "productionPrereqs": [
+      "設置サイト（電源/ネットワーク/設備要件）",
+      "リージョンとの service link 接続",
+      "容量（EC2/ストレージ）の設計と契約"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ラック/サーバーの構成・契約期間・データ転送"
+      ],
+      "relative": "高"
+    },
+    "related": [
+      "ec2",
+      "ebs",
+      "vpc",
+      "directconnect"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 4,
+      "ops": 3,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/outposts/latest/userguide/what-is-outposts.html",
+      "pricing": "https://aws.amazon.com/outposts/rack/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "ram",
+    "name": "AWS Resource Access Manager (RAM)",
+    "category": "management",
+    "oneLiner": "自分のリソースを複数の AWS アカウントや Organizations の OU、IAM ロール/ユーザーへ安全に共有するサービス。共有自体は追加料金なし。",
+    "mainUseCases": [
+      "VPC サブネット等のアカウント横断共有（作成は1回）",
+      "Organizations/OU 単位での一括共有",
+      "重複リソース作成の削減と一元的な権限管理"
+    ],
+    "notSuitableFor": [
+      "公開・外部への配布（共有先は自組織/指定アカウント）",
+      "リソースの所有権移転（所有は共有元のまま）"
+    ],
+    "productionPrereqs": [
+      "共有対象リソースと共有先（アカウント/OU/IAM）",
+      "必要なら Organizations 連携の有効化",
+      "マネージドアクセス権限の設計"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "RAM 自体は追加料金なし（共有リソースの利用料は別）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "organizations",
+      "vpc",
+      "transitgateway"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html",
+      "pricing": "https://aws.amazon.com/ram/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "kendra",
+    "name": "Amazon Kendra",
+    "category": "ai",
+    "oneLiner": "自然言語処理と深層学習で「意味」で探すエンタープライズ検索サービス。キーワードでなく文脈で関連文書を返す（GenAI 索引で RAG にも対応）。",
+    "mainUseCases": [
+      "社内文書・ナレッジの横断的な意味検索",
+      "FAQ/文書からの的確な回答抽出",
+      "RAG（生成AIの根拠データ）としての検索基盤"
+    ],
+    "notSuitableFor": [
+      "ログ/メトリクスの全文・集計検索（それは OpenSearch）",
+      "単純なキーワード一致だけで足りる用途"
+    ],
+    "productionPrereqs": [
+      "データソース（S3/SharePoint 等）のコネクタ設定",
+      "索引（GenAI/Enterprise/Developer）の選定",
+      "アクセス権限に沿った検索結果フィルタ"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "索引の稼働時間・データ同期"
+      ],
+      "relative": "中〜高"
+    },
+    "related": [
+      "opensearch",
+      "bedrock",
+      "s3",
+      "lex"
+    ],
+    "alternatives": [
+      "opensearch"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html",
+      "pricing": "https://aws.amazon.com/kendra/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
