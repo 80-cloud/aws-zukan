@@ -5541,5 +5541,272 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "elasticbeanstalk",
+    "name": "AWS Elastic Beanstalk",
+    "category": "compute",
+    "oneLiner": "コードを上げるだけで EC2・ロードバランサ・スケール・監視まで自動で用意してくれる PaaS 風のデプロイ環境。",
+    "mainUseCases": [
+      "Web アプリを素早くデプロイ（主要言語/Docker 対応）",
+      "SQS を処理する worker 環境",
+      "インフラ詳細を意識せず運用したい場合"
+    ],
+    "notSuitableFor": [
+      "インフラを細かく自前制御したい構成（EC2/ECS を直接組む方が向く）",
+      "コンテナオーケストレーションの高度な制御が要る場合"
+    ],
+    "productionPrereqs": [
+      "プラットフォーム選択（言語/Docker）",
+      "環境変数・スケール設定",
+      "ヘルスチェック"
+    ],
+    "commonRuleRefs": [
+      "monitoring",
+      "cost",
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "EC2/ELB など利用分のみ（Beanstalk 自体は無料）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ec2",
+      "alb",
+      "autoscaling"
+    ],
+    "alternatives": [
+      "ecs",
+      "fargate"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html",
+      "pricing": "https://aws.amazon.com/elasticbeanstalk/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "batch",
+    "name": "AWS Batch",
+    "category": "compute",
+    "oneLiner": "大量のバッチ計算ジョブを、キューに投入すると必要な計算資源を自動で用意して実行するマネージドサービス。",
+    "mainUseCases": [
+      "大規模なバッチ/HPC 計算",
+      "キューに投入して優先度つきで実行",
+      "ECS/EKS/Fargate/EC2(Spot) 上でコスト最適に実行"
+    ],
+    "notSuitableFor": [
+      "低遅延のリクエスト/レスポンス型 API（用途はバッチ実行）",
+      "常時起動のオンライン処理"
+    ],
+    "productionPrereqs": [
+      "ジョブ定義・ジョブキュー",
+      "コンピュート環境（Fargate/EC2/Spot）",
+      "IAM ロール"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "cost",
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "EC2/Fargate など利用分のみ（Batch 自体は無料）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ecs",
+      "fargate",
+      "ec2"
+    ],
+    "alternatives": [
+      "lambda",
+      "stepfunctions"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html",
+      "pricing": "https://aws.amazon.com/batch/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "datasync",
+    "name": "AWS DataSync",
+    "category": "storage",
+    "oneLiner": "ファイル/オブジェクトデータを、オンプレ↔AWS や AWS ストレージ間で高速・安全に転送するサービス。",
+    "mainUseCases": [
+      "オンプレから AWS への大規模データ移行",
+      "コールドデータを S3 Glacier 等へアーカイブ",
+      "S3/EFS/FSx 間のレプリケーション・処理用転送"
+    ],
+    "notSuitableFor": [
+      "DB の移行・継続レプリケーション（それは DMS）",
+      "リアルタイムの双方向同期基盤"
+    ],
+    "productionPrereqs": [
+      "source/target ロケーション",
+      "オンプレなら転送エージェント",
+      "IAM ロール・（任意で）VPC エンドポイント"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "転送データ量（per GB）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "s3",
+      "efs",
+      "fsx"
+    ],
+    "alternatives": [
+      "dms"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html",
+      "pricing": "https://aws.amazon.com/datasync/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "fsx",
+    "name": "Amazon FSx",
+    "category": "storage",
+    "oneLiner": "フルマネージドのファイルシステム群（Windows File Server / Lustre / NetApp ONTAP / OpenZFS）。",
+    "mainUseCases": [
+      "Windows 共有（SMB）や既存 Windows アプリの移行",
+      "HPC/解析向けの高速ファイル（Lustre）",
+      "エンタープライズの共有ファイルストレージ"
+    ],
+    "notSuitableFor": [
+      "オブジェクトストレージ用途（それは S3）",
+      "Linux 向けの単純な共有なら EFS が手軽"
+    ],
+    "productionPrereqs": [
+      "VPC・サブネット",
+      "Windows なら Active Directory",
+      "Single-AZ/Multi-AZ の選択"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "backup"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ストレージ容量・IOPS・スループット"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "s3",
+      "efs",
+      "ebs"
+    ],
+    "alternatives": [
+      "efs",
+      "ebs",
+      "s3"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html",
+      "pricing": "https://aws.amazon.com/fsx/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "documentdb",
+    "name": "Amazon DocumentDB",
+    "category": "database",
+    "oneLiner": "MongoDB 互換のフルマネージド・ドキュメントデータベース。同じドライバ・ツールで使える。",
+    "mainUseCases": [
+      "MongoDB 互換アプリのマネージド移行",
+      "ドキュメント（JSON 風）データの保存",
+      "読み取りを増やすためのレプリカ（最大15）"
+    ],
+    "notSuitableFor": [
+      "関係データの複雑な結合中心の要件（関係 DB が向く）",
+      "MongoDB の最新機能すべてが要る場合（互換に範囲がある）"
+    ],
+    "productionPrereqs": [
+      "VPC 内クラスタ",
+      "レプリカ/Multi-AZ 設計",
+      "KMS 暗号化"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption",
+      "backup"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "インスタンス時間・I/O・バックアップストレージ"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "rds",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "dynamodb",
+      "rds"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/documentdb/latest/developerguide/what-is.html",
+      "pricing": "https://aws.amazon.com/documentdb/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
