@@ -496,5 +496,392 @@
         "role": "権限の土台"
       }
     ]
+  },
+  {
+    "id": "pat-cicd-pipeline",
+    "name": "CI/CD パイプライン",
+    "goal": "コードのビルド→テスト→デプロイを自動化する",
+    "recommendedStack": [
+      "codepipeline",
+      "codebuild",
+      "codedeploy",
+      "ecr"
+    ],
+    "rationale": "CodePipeline が全体を制御し、CodeBuild でビルド／テスト、ECR にイメージを置き、CodeDeploy で安全に配信する。手作業のデプロイ事故と属人化を減らせる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "手動 SSH での都度デプロイは再現性が無く、事故や属人化を招きやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "各段の最小権限ロール",
+      "承認・品質ゲート",
+      "失敗時の通知・ロールバック"
+    ],
+    "optional": [
+      "手動承認ステップ",
+      "テスト自動化",
+      "ソース連携（GitHub 等）"
+    ],
+    "suitableConditions": [
+      "反復的なリリース",
+      "チーム開発",
+      "品質を機械で担保したい"
+    ],
+    "alternatives": [
+      "GitHub Actions",
+      "Jenkins"
+    ],
+    "notes": "小規模・単発なら CI/CD 基盤が過剰な場合もある。",
+    "difficulty": 2,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "◎",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "CI/CD 導入",
+      "チーム開発基盤"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "codepipeline",
+        "role": "全体の制御"
+      },
+      {
+        "serviceId": "codebuild",
+        "role": "ビルド・テスト"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "イメージ保管"
+      },
+      {
+        "serviceId": "codedeploy",
+        "role": "デプロイ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-realtime-stream",
+    "name": "リアルタイムストリーム処理",
+    "goal": "連続データをリアルタイムに取り込み処理する",
+    "recommendedStack": [
+      "kinesis",
+      "lambda",
+      "s3"
+    ],
+    "rationale": "Kinesis でストリームを受け、Lambda で処理し、S3 に蓄積する。ミリ秒級の連続データに対応し、スケールも自動化できる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "sqs"
+        ],
+        "why": "高スループットや順序が要る連続ストリームを単純なキューだけで扱うと、取りこぼしや順序崩れの懸念がある。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "シャード／キャパシティ設計",
+      "IAM 最小権限",
+      "失敗処理（DLQ）"
+    ],
+    "optional": [
+      "OpenSearch（可視化）",
+      "Data Firehose（配信）"
+    ],
+    "suitableConditions": [
+      "連続データ",
+      "リアルタイム要件",
+      "大量イベント"
+    ],
+    "alternatives": [
+      "Amazon Data Firehose",
+      "Amazon MSK"
+    ],
+    "notes": "単発・低頻度のイベントは SQS/EventBridge で十分な場合がある。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "◎",
+      "governanceFit": "○",
+      "migrationEase": "△",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "リアルタイム処理",
+      "データ分析"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "kinesis",
+        "role": "ストリーム取り込み"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "処理"
+      },
+      {
+        "serviceId": "s3",
+        "role": "蓄積"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-graphql-api",
+    "name": "GraphQL API",
+    "goal": "複数データ源を 1 つの GraphQL API で扱う",
+    "recommendedStack": [
+      "appsync",
+      "lambda",
+      "dynamodb",
+      "cognito"
+    ],
+    "rationale": "AppSync が GraphQL とリアルタイム購読を担い、Lambda／DynamoDB をリゾルバに、Cognito で認証する。モバイルや SPA のデータ取得に向く。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "apigateway"
+        ],
+        "why": "過不足ないデータ取得や購読が要件なのに REST のみで作ると、N+1 やオーバーフェッチになりやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "認証・認可（Cognito）",
+      "スキーマ設計",
+      "ログ・監視"
+    ],
+    "optional": [
+      "キャッシュ",
+      "リアルタイム購読",
+      "パイプラインリゾルバ"
+    ],
+    "suitableConditions": [
+      "複数データ源を統合",
+      "モバイル／SPA",
+      "リアルタイム要件"
+    ],
+    "alternatives": [
+      "API Gateway + Lambda（REST）"
+    ],
+    "notes": "単純な REST で足りるなら API Gateway が手軽。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "◎",
+      "cost": "◎",
+      "scalability": "◎",
+      "governanceFit": "○",
+      "migrationEase": "△",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "モバイル／SPA"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "appsync",
+        "role": "GraphQL API"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "リゾルバ"
+      },
+      {
+        "serviceId": "dynamodb",
+        "role": "データ"
+      },
+      {
+        "serviceId": "cognito",
+        "role": "認証"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-web-3tier",
+    "name": "Web 三層（キャッシュ込み）",
+    "goal": "一般的な Web アプリを三層で可用性・性能よく構成する",
+    "recommendedStack": [
+      "alb",
+      "ec2",
+      "rds",
+      "elasticache"
+    ],
+    "rationale": "ALB で受け、EC2（またはコンテナ）でアプリ、RDS で永続化、ElastiCache で読み取りを高速化する。王道の三層に性能対策を加えた構成。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "ec2",
+          "rds"
+        ],
+        "why": "キャッシュ層なしで読み取りを全て RDS に当てると、ピーク時に DB がボトルネックになりやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "プライベートサブネット配置",
+      "HTTPS",
+      "IAM 最小権限",
+      "バックアップ"
+    ],
+    "optional": [
+      "Auto Scaling",
+      "リードレプリカ",
+      "WAF"
+    ],
+    "suitableConditions": [
+      "一般的な Web アプリ",
+      "読み取りが多い",
+      "可用性が要る"
+    ],
+    "alternatives": [
+      "ALB + ECS/Fargate + RDS",
+      "サーバーレス API"
+    ],
+    "notes": "運用負荷を下げたいならコンテナ／サーバーレス化も検討。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "△",
+      "cost": "○",
+      "scalability": "○",
+      "governanceFit": "◎",
+      "migrationEase": "◎",
+      "vendorLockin": "○"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "オンプレ移行"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "alb",
+        "role": "ロードバランサ・HTTPS 終端"
+      },
+      {
+        "serviceId": "ec2",
+        "role": "アプリ実行"
+      },
+      {
+        "serviceId": "rds",
+        "role": "データベース"
+      },
+      {
+        "serviceId": "elasticache",
+        "role": "読み取りキャッシュ"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "通信制御"
+      }
+    ]
+  },
+  {
+    "id": "pat-hybrid-network",
+    "name": "ハイブリッドネットワーク",
+    "goal": "オンプレと複数 VPC を安定的に接続する",
+    "recommendedStack": [
+      "directconnect",
+      "transitgateway",
+      "vpc"
+    ],
+    "rationale": "Direct Connect で専用線接続し、Transit Gateway で複数 VPC・オンプレをハブ集約する。大規模で安定した接続の土台になる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "vpc"
+        ],
+        "why": "多数の VPC を 1 対 1 ピアリングで全結線すると、管理が指数的に複雑化する。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "冗長化（複数接続）",
+      "ルーティング／セグメンテーション設計",
+      "通信制御"
+    ],
+    "optional": [
+      "VPN バックアップ",
+      "Network Firewall"
+    ],
+    "suitableConditions": [
+      "オンプレ連携が要る",
+      "多数の VPC",
+      "安定・低レイテンシ要件"
+    ],
+    "alternatives": [
+      "VPN + VPC ピアリング（小規模）"
+    ],
+    "notes": "VPC が少ない小規模では Transit Gateway は過剰になりやすい。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "△",
+      "cost": "△",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "オンプレ移行",
+      "マルチアカウント統制"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "directconnect",
+        "role": "専用線接続"
+      },
+      {
+        "serviceId": "transitgateway",
+        "role": "接続ハブ"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "接続対象"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "通信制御"
+      }
+    ]
   }
 ]
