@@ -6630,5 +6630,105 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "cdk",
+    "name": "AWS Cloud Development Kit (CDK)",
+    "category": "devtools",
+    "oneLiner": "クラウドインフラを TypeScript/Python 等のプログラミング言語で定義し、CloudFormation 経由でプロビジョニングするオープンソースの IaC フレームワーク。",
+    "mainUseCases": [
+      "プログラミング言語でインフラをコード化（IaC）",
+      "再利用可能な construct でインフラを部品化・共有",
+      "アプリとインフラのコードを一元管理し、コードレビュー/テストを適用"
+    ],
+    "notSuitableFor": [
+      "テンプレートを直接書く宣言的 IaC で十分な場合（それは CloudFormation）",
+      "マルチクラウド前提で統一したい場合（その場合は Terraform 等）"
+    ],
+    "productionPrereqs": [
+      "対応言語のランタイム（Node.js 等）",
+      "CDK Toolkit（CLI）",
+      "CloudFormation を使う権限（IAM）と bootstrap"
+    ],
+    "commonRuleRefs": [
+      "iac-state",
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "CDK 自体は無料（生成される AWS リソースに課金）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "cloudformation",
+      "codepipeline"
+    ],
+    "alternatives": [
+      "cloudformation"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+      "pricing": "https://aws.amazon.com/cloudformation/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "codeartifact",
+    "name": "AWS CodeArtifact",
+    "category": "devtools",
+    "oneLiner": "npm/Maven/pip/NuGet 等のソフトウェアパッケージを保管・共有するマネージドなアーティファクトリポジトリ。",
+    "mainUseCases": [
+      "社内プライベートパッケージの保管・共有",
+      "npmjs/Maven Central/PyPI 等パブリックパッケージのプロキシ/キャッシュ",
+      "ビルド時の依存解決を安定化（外部障害の影響を低減）"
+    ],
+    "notSuitableFor": [
+      "ソースコードのバージョン管理そのもの（役割は成果物/パッケージの保管）",
+      "パッケージを一般公開する用途（公開はできず社内/組織向け）"
+    ],
+    "productionPrereqs": [
+      "domain と repository の設計",
+      "パッケージマネージャの認証トークン設定",
+      "IAM 権限（発行/取得）"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "保管容量・リクエスト・データ転送"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "codebuild",
+      "codepipeline",
+      "codedeploy"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+      "pricing": "https://aws.amazon.com/codeartifact/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
