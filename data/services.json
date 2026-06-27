@@ -5217,5 +5217,66 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "vpcendpoint",
+    "name": "VPC エンドポイント",
+    "category": "networking",
+    "oneLiner": "VPC 内から AWS サービスへ、インターネットを経由せず private に到達する入口。",
+    "mainUseCases": [
+      "private サブネットから S3/DynamoDB へ NAT なしで接続（Gateway 型）",
+      "SSM・ECR など各 AWS サービスへ private 接続（Interface 型 / PrivateLink）",
+      "NAT ゲートウェイのデータ処理料を抑える"
+    ],
+    "notSuitableFor": [
+      "VPC を持たない構成（必要なし）",
+      "対象が公開 Web 前提で private 到達が不要な場合"
+    ],
+    "productionPrereqs": [
+      "Gateway 型（S3/DynamoDB）はルートテーブルへ prefix list 経路を関連付け",
+      "Interface 型は subnet に ENI＋443 を許可するセキュリティグループ",
+      "private DNS を使うなら VPC の DNS hostnames/resolution を有効化"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "cost"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "Interface 型の時間課金・データ処理料"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "vpc",
+      "s3",
+      "dynamodb",
+      "ssm",
+      "ecr"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+      "pricing": "https://aws.amazon.com/privatelink/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html",
+        "gotcha": "Gateway 型エンドポイントは S3 と DynamoDB のみ対応で追加料金なし。private サブネットからこの2つへ NAT なしで到達したいときに使う。ルートテーブルにサービスの prefix list 経路を関連付けて初めて効く（関連付いていないサブネットは公開エンドポイント経由のまま）。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html",
+        "gotcha": "Interface 型（PrivateLink）は SSM・ECR など多くの AWS サービス向けで、subnet に ENI を作る。時間課金＋データ処理料がかかるため、NAT 回避のつもりでも対象サービスが多いと割高になりうる。セキュリティグループで 443 を許可し、private DNS を使うなら VPC の DNS hostnames/resolution を有効にする。"
+      }
+    ]
   }
 ]
