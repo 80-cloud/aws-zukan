@@ -3983,5 +3983,516 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "bedrock",
+    "name": "Amazon Bedrock",
+    "category": "ai",
+    "tier": 1,
+    "oneLiner": "基盤モデル(LLM 等)を API で使える生成 AI のマネージドサービス。アプリに生成 AI／エージェントを組み込む。",
+    "mainUseCases": [
+      "文章生成／要約",
+      "チャット／エージェント",
+      "画像生成・RAG 連携"
+    ],
+    "notSuitableFor": [
+      "独自モデルを一から学習（→ SageMaker）",
+      "オンプレ完結の要件"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "呼び出し"
+      },
+      {
+        "serviceId": "s3",
+        "role": "データ／RAG"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "sagemaker",
+      "lambda"
+    ],
+    "alternatives": [
+      "sagemaker"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "モデル／リージョンの選定",
+      "入出力のガードレール",
+      "コスト（トークン）管理"
+    ],
+    "costGotcha": "入出力トークン数で課金。大きなプロンプト／大量呼び出しで増える。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "入力トークン",
+        "出力トークン"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "モデル切替は出力特性に影響。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/bedrock/",
+      "pricing": "https://aws.amazon.com/bedrock/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "sagemaker",
+    "name": "Amazon SageMaker",
+    "category": "ai",
+    "tier": 1,
+    "oneLiner": "機械学習モデルの構築・学習・デプロイを一貫して行うマネージドな ML プラットフォーム。",
+    "mainUseCases": [
+      "独自 ML モデルの学習／推論",
+      "生成 AI の独自データ活用",
+      "MLOps／ガバナンス"
+    ],
+    "notSuitableFor": [
+      "既製モデルを手早く使うだけ（→ Bedrock）",
+      "ML 専門知識が不要な軽い用途"
+    ],
+    "companions": [
+      {
+        "serviceId": "s3",
+        "role": "データ"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "コンテナ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "bedrock",
+      "s3"
+    ],
+    "alternatives": [
+      "bedrock"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "データ／特徴量の準備",
+      "学習／推論インスタンス設計",
+      "モデルのガバナンス"
+    ],
+    "costGotcha": "学習／推論インスタンス時間で課金。常時起動エンドポイントの固定費に注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "インスタンス時間",
+        "ストレージ"
+      ],
+      "relative": "高"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "成果物は S3／IaC 管理。",
+      "changeImpact": "エンドポイント更新は段階デプロイ。",
+      "failover": "マルチ AZ 構成が可能。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/sagemaker/",
+      "pricing": "https://aws.amazon.com/sagemaker/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "amplify",
+    "name": "AWS Amplify",
+    "category": "devtools",
+    "tier": 1,
+    "oneLiner": "Web／モバイルのフルスタック開発とホスティングをまとめて行うプラットフォーム。認証／API／ストレージを統合。",
+    "mainUseCases": [
+      "SPA／SSR(Next.js 等)のホスティング",
+      "モバイルアプリのバックエンド",
+      "認証／データの素早い構築"
+    ],
+    "notSuitableFor": [
+      "細かい個別 AWS 設定を直接制御したい用途",
+      "既存モノリスの全面管理"
+    ],
+    "companions": [
+      {
+        "serviceId": "appsync",
+        "role": "GraphQL API"
+      },
+      {
+        "serviceId": "cognito",
+        "role": "認証"
+      },
+      {
+        "serviceId": "s3",
+        "role": "ストレージ"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "関数"
+      }
+    ],
+    "related": [
+      "appsync",
+      "cognito",
+      "cloudfront"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "環境（ブランチ）分離",
+      "認証／認可設定",
+      "ビルド／デプロイ設定"
+    ],
+    "costGotcha": "ビルド時間＋ホスティング転送量で課金。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "ビルド時間",
+        "転送量",
+        "ストレージ"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "構成は IaC 管理。",
+      "changeImpact": "ブランチ単位でデプロイ。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/amplify/",
+      "pricing": "https://aws.amazon.com/amplify/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "securityhub",
+    "name": "AWS Security Hub",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "各種セキュリティサービスやパートナー製品の検出結果を集約し、優先度付け・自動対応する統合基盤。",
+    "mainUseCases": [
+      "検出結果の一元集約（GuardDuty／Inspector／Macie 等）",
+      "重大リスクの優先度付け",
+      "マルチアカウントの統制"
+    ],
+    "notSuitableFor": [
+      "単体の検知そのもの（検知は各サービス）",
+      "詳細な根本調査（→ Detective）"
+    ],
+    "companions": [
+      {
+        "serviceId": "guardduty",
+        "role": "検出元"
+      },
+      {
+        "serviceId": "inspector",
+        "role": "検出元"
+      },
+      {
+        "serviceId": "macie",
+        "role": "検出元"
+      },
+      {
+        "serviceId": "config",
+        "role": "準拠評価"
+      }
+    ],
+    "related": [
+      "guardduty",
+      "inspector",
+      "macie"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "logging",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "統合する検出ソースの有効化",
+      "重大度／ワークフロー設計",
+      "マルチアカウント集約"
+    ],
+    "costGotcha": "取り込む検出／チェック数で課金。広く有効化すると増える。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "セキュリティチェック数",
+        "取込検出数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "有効化／基準変更は即時。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/security-hub/",
+      "pricing": "https://aws.amazon.com/security-hub/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "detective",
+    "name": "Amazon Detective",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "ログを ML／グラフ分析して脅威の根本原因や影響範囲を調べるセキュリティ調査サービス。",
+    "mainUseCases": [
+      "検知結果の深掘り調査",
+      "インシデントの影響／原因分析",
+      "リソース単位の活動追跡"
+    ],
+    "notSuitableFor": [
+      "検知そのもの（→ GuardDuty）",
+      "集約／優先度付け（→ Security Hub）"
+    ],
+    "companions": [
+      {
+        "serviceId": "guardduty",
+        "role": "調査の起点"
+      },
+      {
+        "serviceId": "cloudtrail",
+        "role": "分析データ"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "フローログ"
+      }
+    ],
+    "related": [
+      "guardduty",
+      "cloudtrail"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "logging",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "データソースの有効化",
+      "GuardDuty 等との連携",
+      "調査フローの整備"
+    ],
+    "costGotcha": "取り込んだログ量で課金。データソースを広げると増える。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "取込ログ量"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "データソース変更は分析範囲に影響。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/detective/",
+      "pricing": "https://aws.amazon.com/detective/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "directconnect",
+    "name": "AWS Direct Connect",
+    "category": "networking",
+    "tier": 1,
+    "oneLiner": "AWS への専用線接続を提供するサービス。インターネットを介さず安定・高帯域でオンプレと結ぶ。",
+    "mainUseCases": [
+      "オンプレと AWS のハイブリッド接続",
+      "大容量データの安定転送",
+      "一貫した低レイテンシ"
+    ],
+    "notSuitableFor": [
+      "一時的／低帯域でよい接続（→ VPN が手軽・安価）",
+      "小規模で専用線が過剰な場合"
+    ],
+    "companions": [
+      {
+        "serviceId": "vpc",
+        "role": "接続先"
+      },
+      {
+        "serviceId": "transitgateway",
+        "role": "集約接続"
+      }
+    ],
+    "related": [
+      "vpc",
+      "transitgateway"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "productionPrereqs": [
+      "接続ロケーション／回線手配",
+      "冗長化（複数接続）",
+      "ルーティング設計"
+    ],
+    "costGotcha": "ポート時間＋データ転送（アウト）で課金。回線手配のリードタイムも要考慮。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ポート時間",
+        "データ転送アウト"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 3
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "構成は IaC 管理。",
+      "changeImpact": "回線／ルート変更は接続に影響。",
+      "failover": "複数接続で冗長化。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/directconnect/",
+      "pricing": "https://aws.amazon.com/directconnect/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
