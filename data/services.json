@@ -248,6 +248,10 @@
       {
         "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4",
         "gotcha": "Terraform の state 置き場に使うときは、バージョニング・暗号化・パブリックアクセス遮断をセットで有効にする（state には機密が平文で入りうる）。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html",
+        "gotcha": "パブリックアクセスブロックだけでは通信の暗号化までは強制されない。HTTP 平文アクセスを塞ぐには、バケットポリシーで aws:SecureTransport が false のリクエストを明示的に Deny する。これで TLS 必須を強制できる。"
       }
     ]
   },
@@ -1170,7 +1174,12 @@
       "overview": "https://aws.amazon.com/ecs/",
       "pricing": "https://aws.amazon.com/ecs/pricing/"
     },
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html",
+        "gotcha": "ロードバランサ配下のサービスは healthCheckGracePeriodSeconds の既定が 0。起動に時間のかかるアプリ（フレームワーク初期化など）だと、起動完了前に ELB ヘルスチェックで unhealthy と判定されてタスクが停止し、再起動を繰り返すループになりやすい。起動所要時間をカバーする秒数を設定して回避する。"
+      }
+    ],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
   },
@@ -1605,7 +1614,12 @@
       "overview": "https://aws.amazon.com/kms/",
       "pricing": "https://aws.amazon.com/kms/pricing/"
     },
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html",
+        "gotcha": "AWS マネージドの既定キー（aws/ssm など）は ARN を固定できないため、IAM ポリシーの Resource で個別キーを名指しできない。代わりに条件キー kms:ViaService（例: ssm.<region>.amazonaws.com）で「その AWS サービス経由のリクエストのみ」に限定すれば、Resource をワイルドカードにしても利用範囲を絞れる。"
+      }
+    ],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
   },
@@ -2306,7 +2320,12 @@
       "overview": "https://aws.amazon.com/systems-manager/",
       "pricing": "https://aws.amazon.com/systems-manager/pricing/"
     },
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html",
+        "gotcha": "Parameter Store / Secrets Manager の値はコンテナ起動時に1回だけ注入される。値を更新しても、すでに動いているタスクには自動反映されない。新しい値を反映するにはタスクを起動し直すか、サービスを force new deployment する必要がある。"
+      }
+    ],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
   },
