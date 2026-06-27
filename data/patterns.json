@@ -4,6 +4,7 @@
     "name": "静的サイト/LP/ドキュメントの公開",
     "goal": "サーバー処理が不要な、ファイル配信中心のサイトを公開する",
     "recommendedStack": ["s3", "cloudfront", "route53", "acm"],
+    "stackRoles": [{"serviceId": "s3", "role": "静的ファイルの配信元（オリジン）"}, {"serviceId": "cloudfront", "role": "CDN・HTTPS 配信"}, {"serviceId": "route53", "role": "DNS（ドメイン名の解決）"}, {"serviceId": "acm", "role": "TLS 証明書（HTTPS 用）"}],
     "rationale": "常時稼働サーバーを持たず、配信は CDN に任せる。OS パッチや監視の負担が小さい。",
     "antiPatterns": [
       { "stack": ["ec2"], "why": "この要件では EC2 上に Web サーバーを置くと、OS パッチ・監視・スケールの運用負荷が相対的に高い。", "source": null }
@@ -51,6 +52,7 @@
     "name": "RDS への安全な接続",
     "goal": "アプリの DB(RDS)を、外から触れないように隔離しつつ EC2 から使う",
     "recommendedStack": ["rds", "ec2", "vpc", "securitygroup"],
+    "stackRoles": [{"serviceId": "rds", "role": "データベース（private に隔離）"}, {"serviceId": "ec2", "role": "アプリ実行（DB に接続）"}, {"serviceId": "vpc", "role": "ネットワーク（public/private 分離）"}, {"serviceId": "securitygroup", "role": "通信制御（EC2→RDS のみ許可）"}],
     "rationale": "RDS を private サブネットに「パブリックアクセスなし」で置き、許可元を EC2 の SG にする。DB へは VPC 内の EC2 を経由して接続する。",
     "antiPatterns": [
       { "stack": ["rds"], "why": "パブリックアクセスを有効にして外から直結できるようにすると、攻撃面が広がる。隔離の利点を失う。", "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06" }
@@ -72,6 +74,7 @@
     "name": "Terraform のリモート state 管理（bootstrap）",
     "goal": "Terraform の state をチームで共有し、同時 apply の事故を防ぐ",
     "recommendedStack": ["s3", "dynamodb"],
+    "stackRoles": [{"serviceId": "s3", "role": "state ファイルの保管"}, {"serviceId": "dynamodb", "role": "state ロック（同時実行の排他制御）"}],
     "rationale": "state 置き場(S3)を作るための state をどこに置くか、という鶏と卵を、置き場だけを作る小さな bootstrap スタック(ローカル state)で先に解消する。",
     "antiPatterns": [
       { "stack": ["s3"], "why": "本体コードにいきなり「S3 を backend に使う」と書くと、その S3 がまだ無いため初回が成り立たず詰む(鶏と卵)。", "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4" }
@@ -93,6 +96,7 @@
     "name": "EC2 への自動デプロイ（手元ビルド→ECR→pull）",
     "goal": "terraform apply 1 発に近い形で、EC2 へアプリを自動デプロイする",
     "recommendedStack": ["ec2", "ecr", "iam"],
+    "stackRoles": [{"serviceId": "ec2", "role": "アプリ実行（イメージを pull）"}, {"serviceId": "ecr", "role": "コンテナイメージの保管"}, {"serviceId": "iam", "role": "EC2 が ECR から pull する権限"}],
     "rationale": "重いビルドは手元でやり、ECR に push。EC2 は起動時に IAM ロールの一時資格で ECR から pull して動かすだけにする。",
     "antiPatterns": [
       { "stack": ["ec2"], "why": "EC2 の中でビルドすると、小さいインスタンスでメモリ不足になりやすい。", "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8" },

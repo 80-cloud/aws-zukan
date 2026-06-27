@@ -14,10 +14,12 @@ export interface Service {
 }
 export interface AntiPattern { stack: string[]; why: string; source?: string | null }
 export interface PatternEvaluation { security?: string; availability?: string; opsLoad?: string; cost?: string; scalability?: string; governanceFit?: string; migrationEase?: string; vendorLockin?: string; [k: string]: string | undefined }
+export interface StackRole { serviceId: string; role: string }
 export interface Pattern {
   id: string; name: string; goal: string; recommendedStack: string[]; rationale: string
   antiPatterns: AntiPattern[]; requiredGovernance: string[]; optional: string[]
   suitableConditions: string[]; alternatives: string[]; notes?: string; difficulty: number
   evaluation: PatternEvaluation; scenarioTags: string[]; realWorldNotes?: RealWorldNote[]
+  stackRoles?: StackRole[]
 }
 export interface CommonRule { key: string; title: string; body: string }

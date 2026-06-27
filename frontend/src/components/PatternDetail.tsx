@@ -15,7 +15,6 @@ function Chips({ ids }: { ids: string[] }) {
   return <div className="flex flex-wrap gap-2">{ids.map(id => <Link key={id} to={`/service/${id}`} className="rounded-full border border-gray-200 px-2 py-0.5 text-xs hover:bg-gray-50">{id}</Link>)}</div>
 }
 // 実在する service id だけリンク化し、説明文（実在しない文字列）はただのテキストとして表示する。
-// alternatives は service id ではなく説明文（"ECS/Fargate + ALB" 等）が混在するため、壊れリンクを防ぐ。
 function RefChips({ items }: { items: string[] }) {
   if (!items?.length) return <span className="text-gray-400">—</span>
   return <div className="flex flex-wrap gap-2">{items.map((item, i) => (
@@ -35,6 +34,18 @@ export default function PatternDetail() {
       <h1 className="mt-2 text-2xl font-bold">{p.name}</h1>
       <p className="mt-1 text-gray-700">{p.goal}</p>
       <Section title="推奨スタック"><Chips ids={p.recommendedStack} /></Section>
+      {p.stackRoles?.length ? (
+        <Section title="構成の役割（各サービスの担当）">
+          <ul className="space-y-2">
+            {p.stackRoles.map((sr, i) => (
+              <li key={i} className="flex items-baseline gap-2 rounded-md border border-gray-200 p-2">
+                <Link to={`/service/${sr.serviceId}`} className="shrink-0 rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-blue-600 hover:underline">{sr.serviceId}</Link>
+                <span className="text-sm text-gray-700">{sr.role}</span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
       <Section title="この構成が向く理由"><p>{p.rationale}</p></Section>
       <Section title="評価（8軸 ◎○△）">
         <div className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-4">
