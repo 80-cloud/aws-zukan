@@ -2462,5 +2462,514 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "eventbridge",
+    "name": "Amazon EventBridge",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "イベントを条件で振り分けて多数のサービスへ届けるサーバーレスなイベントバス。スケジュール実行も可能。",
+    "mainUseCases": [
+      "イベント駆動の疎結合連携",
+      "SaaS／AWS イベントのルーティング",
+      "定期実行（Scheduler）"
+    ],
+    "notSuitableFor": [
+      "単純な 1 対 1 キュー（→ SQS）",
+      "単純な fan-out のみ（→ SNS で十分）"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "ターゲット"
+      },
+      {
+        "serviceId": "sqs",
+        "role": "ターゲット／緩衝"
+      },
+      {
+        "serviceId": "sns",
+        "role": "連携"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "lambda",
+      "sns",
+      "sqs"
+    ],
+    "alternatives": [
+      "sns"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "イベントパターン設計",
+      "ターゲットの DLQ",
+      "ルールの最小権限"
+    ],
+    "costGotcha": "取り込んだイベント数で課金（標準の AWS イベントは無料が多い）。カスタムイベント量に注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "カスタムイベント数",
+        "スキーマ検出"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "ルール／定義は IaC 管理。",
+      "changeImpact": "ルール変更は即時反映。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/eventbridge/",
+      "pricing": "https://aws.amazon.com/eventbridge/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "backup",
+    "name": "AWS Backup",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "複数サービスのバックアップを一元管理・自動化するマネージドサービス。ポリシーで横断的に保護する。",
+    "mainUseCases": [
+      "EBS／RDS／EFS／DynamoDB 等の集中バックアップ",
+      "ポリシーでの保護ガバナンス",
+      "クロスリージョン／アカウント保護"
+    ],
+    "notSuitableFor": [
+      "リアルタイム同期／レプリケーション",
+      "アプリ内の論理バックアップ要件の全代替"
+    ],
+    "companions": [
+      {
+        "serviceId": "ebs",
+        "role": "保護対象"
+      },
+      {
+        "serviceId": "rds",
+        "role": "保護対象"
+      },
+      {
+        "serviceId": "efs",
+        "role": "保護対象"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "ebs",
+      "rds",
+      "efs"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "バックアップ計画（頻度／保持）",
+      "クロスアカウント／リージョン保管",
+      "復元テスト"
+    ],
+    "costGotcha": "バックアップ保管量＋復元／クロスリージョン転送で課金。保持期間が長いと積み上がる。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "保管量",
+        "復元",
+        "クロスリージョン転送"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "バックアップ計画はマネージドで実行。",
+      "changeImpact": "計画変更は次回実行から反映。",
+      "failover": "クロスリージョン／アカウントへ複製可。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/backup/",
+      "pricing": "https://aws.amazon.com/backup/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "organizations",
+    "name": "AWS Organizations",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "複数 AWS アカウントを一元統治するサービス。SCP・一括請求・OU でガバナンスを効かせる。",
+    "mainUseCases": [
+      "マルチアカウントのガバナンス（SCP）",
+      "一括請求／ボリューム割引",
+      "OU での方針適用"
+    ],
+    "notSuitableFor": [
+      "単一アカウント運用",
+      "アプリ内の権限制御（→ IAM）"
+    ],
+    "companions": [
+      {
+        "serviceId": "iam",
+        "role": "権限の土台"
+      },
+      {
+        "serviceId": "config",
+        "role": "準拠評価"
+      },
+      {
+        "serviceId": "cloudtrail",
+        "role": "監査集約"
+      }
+    ],
+    "related": [
+      "iam",
+      "config"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "OU 設計",
+      "SCP の最小権限／ガードレール",
+      "管理アカウントの保護"
+    ],
+    "costGotcha": "Organizations 自体は無料。配下リソース／連携サービスの課金に注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 3
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "構成は IaC 管理。",
+      "changeImpact": "SCP 変更は配下アカウントへ即時影響。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/organizations/",
+      "pricing": "https://aws.amazon.com/organizations/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "redshift",
+    "name": "Amazon Redshift",
+    "category": "analytics",
+    "tier": 1,
+    "oneLiner": "大規模データ分析向けのクラウドデータウェアハウス。集計／BI を高速に処理する。",
+    "mainUseCases": [
+      "BI／レポート／ダッシュボード",
+      "大規模データの集計分析",
+      "データ共有／レイクハウス"
+    ],
+    "notSuitableFor": [
+      "トランザクション処理（→ RDS／Aurora）",
+      "低頻度のアドホック（→ Athena が手軽）"
+    ],
+    "companions": [
+      {
+        "serviceId": "s3",
+        "role": "ロード元／アンロード"
+      },
+      {
+        "serviceId": "glue",
+        "role": "ETL／カタログ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "athena",
+      "rds",
+      "s3"
+    ],
+    "alternatives": [
+      "athena"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "private 配置／接続制御",
+      "分散キー／ソートキー設計",
+      "スナップショット／暗号化"
+    ],
+    "costGotcha": "ノード時間（またはサーバーレス容量）で課金。常時起動クラスタの固定費に注意。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ノード時間",
+        "ストレージ",
+        "サーバーレス容量"
+      ],
+      "relative": "高"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "自動スナップショット対応。",
+      "changeImpact": "ノード変更／リサイズは再構成を伴う。",
+      "failover": "マルチ AZ 構成が可能。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/redshift/",
+      "pricing": "https://aws.amazon.com/redshift/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "shield",
+    "name": "AWS Shield",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "DDoS 攻撃から守るマネージドサービス。Standard は標準付帯、Advanced は高度な防御を提供。",
+    "mainUseCases": [
+      "L3／L4／L7 の DDoS 防御",
+      "公開エンドポイントの保護",
+      "Advanced での高度な緩和／サポート"
+    ],
+    "notSuitableFor": [
+      "Web アプリの攻撃(SQLi／XSS)対策（→ WAF）",
+      "アプリ層の認可"
+    ],
+    "companions": [
+      {
+        "serviceId": "cloudfront",
+        "role": "保護先"
+      },
+      {
+        "serviceId": "route53",
+        "role": "保護先"
+      },
+      {
+        "serviceId": "alb",
+        "role": "保護先"
+      },
+      {
+        "serviceId": "waf",
+        "role": "併用"
+      }
+    ],
+    "related": [
+      "waf",
+      "cloudfront"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "productionPrereqs": [
+      "保護対象リソースの整理",
+      "WAF との併用設計",
+      "Advanced は対応体制／コスト検討"
+    ],
+    "costGotcha": "Standard は無料。Advanced は月額固定＋データ転送等で高額になりうる。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "Advanced 月額",
+        "データ転送"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "保護設定の変更は即時。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/shield/",
+      "pricing": "https://aws.amazon.com/shield/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "transitgateway",
+    "name": "AWS Transit Gateway",
+    "category": "networking",
+    "tier": 1,
+    "oneLiner": "複数 VPC やオンプレを中央ハブでつなぐクラウドルーター。大規模ネットワークの接続を簡素化する。",
+    "mainUseCases": [
+      "多数 VPC のハブ接続",
+      "オンプレ／拠点との集約接続",
+      "リージョン間ピアリング"
+    ],
+    "notSuitableFor": [
+      "VPC が 1〜2 個の小規模（→ VPC ピアリングが簡単／低コスト）",
+      "単純構成"
+    ],
+    "companions": [
+      {
+        "serviceId": "vpc",
+        "role": "接続対象"
+      }
+    ],
+    "related": [
+      "vpc"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "productionPrereqs": [
+      "ルートテーブル／アタッチメント設計",
+      "セグメンテーション（分離）",
+      "帯域／コスト見積り"
+    ],
+    "costGotcha": "アタッチメント時間＋データ処理量で課金。VPC が少ないとピアリングより割高。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "アタッチメント時間",
+        "データ処理量"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "構成は IaC 管理。",
+      "changeImpact": "ルート／アタッチメント変更は経路に影響。",
+      "failover": "複数 AZ／リージョンで冗長設計可。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/transit-gateway/",
+      "pricing": "https://aws.amazon.com/transit-gateway/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
