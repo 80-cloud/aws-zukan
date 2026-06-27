@@ -1419,5 +1419,540 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "apigateway",
+    "name": "Amazon API Gateway",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "REST／HTTP／WebSocket API を作成・公開・保護するマネージドサービス。サーバーレス API の入口。",
+    "mainUseCases": [
+      "サーバーレス API（Lambda 連携）",
+      "マイクロサービスの公開",
+      "WebSocket のリアルタイム通信"
+    ],
+    "notSuitableFor": [
+      "単純な静的配信（→ S3＋CloudFront）",
+      "超低レイテンシ・大量 TCP（→ NLB）"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "バックエンド"
+      },
+      {
+        "serviceId": "iam",
+        "role": "認可"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "ログ／メトリクス"
+      },
+      {
+        "serviceId": "waf",
+        "role": "保護"
+      }
+    ],
+    "related": [
+      "lambda",
+      "alb",
+      "cloudfront"
+    ],
+    "alternatives": [
+      "alb"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "logging"
+    ],
+    "productionPrereqs": [
+      "認証・認可（IAM／オーソライザ）",
+      "スロットリング／使用量プラン",
+      "アクセスログ"
+    ],
+    "costGotcha": "リクエスト数＋転送量で課金。REST API は HTTP API より単価が高い。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "リクエスト数",
+        "転送量"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "定義は IaC 管理。",
+      "changeImpact": "ステージ／デプロイで段階反映。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/api-gateway/",
+      "pricing": "https://aws.amazon.com/api-gateway/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "secretsmanager",
+    "name": "AWS Secrets Manager",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "DB 認証情報や API キーを安全に保管し、自動ローテーションできるマネージドな機密管理。",
+    "mainUseCases": [
+      "DB 認証情報の集中管理",
+      "シークレットの自動ローテーション",
+      "アプリからの安全な取得"
+    ],
+    "notSuitableFor": [
+      "単純な設定値の保管（→ SSM Parameter Store が安価）",
+      "大きなファイルの保管"
+    ],
+    "companions": [
+      {
+        "serviceId": "rds",
+        "role": "認証情報の対象"
+      },
+      {
+        "serviceId": "iam",
+        "role": "アクセス制御"
+      },
+      {
+        "serviceId": "kms",
+        "role": "暗号化"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "ローテーション"
+      }
+    ],
+    "related": [
+      "iam",
+      "kms",
+      "rds"
+    ],
+    "alternatives": [
+      "ssm"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "最小権限のアクセスポリシー",
+      "ローテーション設定",
+      "KMS での暗号化"
+    ],
+    "costGotcha": "シークレットごとの月額＋API 課金。単純な設定値はパラメータストアの無料枠で代替できる場合がある。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "シークレット数",
+        "API リクエスト数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "マネージドで多重化。",
+      "changeImpact": "ローテーションは段階反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/secrets-manager/",
+      "pricing": "https://aws.amazon.com/secrets-manager/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "ssm",
+    "name": "AWS Systems Manager (SSM)",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "サーバー運用を一元化するツール群。踏み台レス接続(Session Manager)・設定値保管(Parameter Store)・パッチ管理など。",
+    "mainUseCases": [
+      "踏み台なしの安全な接続（Session Manager）",
+      "設定値の参照（Parameter Store）",
+      "パッチ・運用の自動化"
+    ],
+    "notSuitableFor": [
+      "機密の高度なローテーション（→ Secrets Manager）",
+      "アプリのメトリクス監視（→ CloudWatch）"
+    ],
+    "companions": [
+      {
+        "serviceId": "ec2",
+        "role": "管理対象"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "ログ"
+      }
+    ],
+    "related": [
+      "ec2",
+      "iam",
+      "secretsmanager"
+    ],
+    "alternatives": [
+      "secretsmanager"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "logging"
+    ],
+    "productionPrereqs": [
+      "SSM エージェント／インスタンスプロファイル",
+      "最小権限",
+      "Session Manager のログ記録"
+    ],
+    "costGotcha": "多くは無料だが、advanced パラメータや一部機能・大量 API は課金対象。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "advanced パラメータ",
+        "一部機能の操作数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "ドキュメント／自動化は即時。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/systems-manager/",
+      "pricing": "https://aws.amazon.com/systems-manager/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "waf",
+    "name": "AWS WAF",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "SQL インジェクションや XSS など一般的な攻撃・不正ボットを遮断する Web アプリケーションファイアウォール。",
+    "mainUseCases": [
+      "一般的な Web 攻撃の遮断（SQLi／XSS）",
+      "IP／レート制限",
+      "ボット対策"
+    ],
+    "notSuitableFor": [
+      "ネットワーク層(L3／L4)の防御（→ セキュリティグループ／NACL）",
+      "アプリ内部のロジック保護"
+    ],
+    "companions": [
+      {
+        "serviceId": "cloudfront",
+        "role": "適用先"
+      },
+      {
+        "serviceId": "alb",
+        "role": "適用先"
+      },
+      {
+        "serviceId": "apigateway",
+        "role": "適用先"
+      }
+    ],
+    "related": [
+      "cloudfront",
+      "alb",
+      "apigateway"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "productionPrereqs": [
+      "マネージドルールの選定",
+      "レート制限／WAF ログの有効化",
+      "誤検知の調整（カウントモードで検証）"
+    ],
+    "costGotcha": "Web ACL／ルール数＋リクエスト数で課金。マネージドルールの追加で単価が増える。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "Web ACL 数",
+        "ルール数",
+        "リクエスト数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "ルールは IaC 管理。",
+      "changeImpact": "ルール変更は即時反映。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/waf/",
+      "pricing": "https://aws.amazon.com/waf/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "stepfunctions",
+    "name": "AWS Step Functions",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "複数サービスをつなぐワークフロー（ステートマシン）を可視化して動かすサーバーレスなオーケストレーション。",
+    "mainUseCases": [
+      "複数 Lambda／サービスの処理フロー",
+      "ETL／バッチの制御",
+      "承認ステップを含む業務フロー"
+    ],
+    "notSuitableFor": [
+      "単一関数の実行（→ Lambda 直）",
+      "超低レイテンシの同期処理"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "各ステップ"
+      },
+      {
+        "serviceId": "sns",
+        "role": "通知"
+      },
+      {
+        "serviceId": "sqs",
+        "role": "キュー"
+      },
+      {
+        "serviceId": "iam",
+        "role": "実行ロール"
+      }
+    ],
+    "related": [
+      "lambda",
+      "sns",
+      "sqs"
+    ],
+    "alternatives": [
+      "lambda"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "logging"
+    ],
+    "productionPrereqs": [
+      "実行ロールの最小権限",
+      "リトライ／エラーハンドリング設計",
+      "実行ログ（CloudWatch）"
+    ],
+    "costGotcha": "標準ワークフローは状態遷移数で課金。遷移が多いと積み上がる（Express は実行時間課金）。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "状態遷移数（標準）",
+        "実行時間（Express）"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "定義は IaC 管理。",
+      "changeImpact": "定義更新は新規実行から反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/step-functions/",
+      "pricing": "https://aws.amazon.com/step-functions/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "elasticache",
+    "name": "Amazon ElastiCache",
+    "category": "database",
+    "tier": 1,
+    "oneLiner": "Redis／Valkey／Memcached 互換のインメモリキャッシュ。DB 前段の高速化やセッション保存に使う。",
+    "mainUseCases": [
+      "DB 前段のキャッシュ（読み取り高速化）",
+      "セッションストア",
+      "一時データ／ランキング等"
+    ],
+    "notSuitableFor": [
+      "永続が必須の主データ保存（→ RDS／DynamoDB）",
+      "複雑なクエリ・集計"
+    ],
+    "companions": [
+      {
+        "serviceId": "rds",
+        "role": "キャッシュ元 DB"
+      },
+      {
+        "serviceId": "ec2",
+        "role": "接続元"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク隔離"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "接続制御"
+      }
+    ],
+    "related": [
+      "rds",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "dynamodb"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "private サブネットへ配置",
+      "接続制御（セキュリティグループ）",
+      "フェイルオーバー／レプリカ設計"
+    ],
+    "costGotcha": "ノード（インスタンス）時間で課金。常時起動・過剰スペックに注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "ノード時間",
+        "データ転送"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "スナップショット対応（エンジンによる）。",
+      "changeImpact": "ノード変更は再起動を伴うことがある。",
+      "failover": "マルチ AZ でフェイルオーバー。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/elasticache/",
+      "pricing": "https://aws.amazon.com/elasticache/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
