@@ -384,5 +384,527 @@
       "failover": ""
     },
     "realWorldNotes": []
+  },
+  {
+    "id": "efs",
+    "name": "Amazon EFS",
+    "category": "storage",
+    "tier": 1,
+    "oneLiner": "複数の EC2／コンテナから同時マウントできる、自動で伸縮するマネージドな共有ファイルストレージ（NFS）。",
+    "mainUseCases": [
+      "複数インスタンス間のファイル共有",
+      "コンテナ/サーバーレスの永続データ",
+      "CMS やビルド成果物の共有"
+    ],
+    "notSuitableFor": [
+      "単一インスタンス向けのブロックストレージ用途（→ EBS）",
+      "低レイテンシな DB 用ストレージ",
+      "静的配信（→ S3＋CloudFront）"
+    ],
+    "companions": [
+      {
+        "serviceId": "ec2",
+        "role": "マウント先"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "NFS(2049) の通信制御"
+      }
+    ],
+    "related": [
+      "ebs",
+      "s3",
+      "ec2"
+    ],
+    "alternatives": [
+      "ebs",
+      "s3"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "各 AZ にマウントターゲットを配置",
+      "セキュリティグループで NFS(2049) を制御",
+      "保管時暗号化を有効化"
+    ],
+    "costGotcha": "使った容量で課金。低頻度アクセス階層(IA)へのライフサイクル移行をしないと割高になりやすい。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "容量",
+        "スループット",
+        "IA 階層への移行"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "AWS Backup に対応。",
+      "changeImpact": "マウント設定の変更は再マウントが要る。",
+      "failover": "リージョン内の複数 AZ に冗長化。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/efs/",
+      "pricing": "https://aws.amazon.com/efs/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "ecs",
+    "name": "Amazon ECS",
+    "category": "compute",
+    "tier": 1,
+    "oneLiner": "コンテナをまとめて動かす（オーケストレーション）マネージドサービス。実行基盤は Fargate（サーバーレス）か EC2 を選べる。",
+    "mainUseCases": [
+      "コンテナアプリの本番運用",
+      "バッチ処理",
+      "VM ベースアプリのコンテナ移行"
+    ],
+    "notSuitableFor": [
+      "単発のイベント駆動処理（→ Lambda）",
+      "Kubernetes API が要件の場合（→ EKS）"
+    ],
+    "companions": [
+      {
+        "serviceId": "ecr",
+        "role": "イメージの取得元"
+      },
+      {
+        "serviceId": "alb",
+        "role": "前段のロードバランサ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "タスク実行ロール"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "ログ／メトリクス"
+      }
+    ],
+    "related": [
+      "ec2",
+      "ecr",
+      "lambda"
+    ],
+    "alternatives": [
+      "lambda",
+      "ec2"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "productionPrereqs": [
+      "タスク実行ロール(IAM)の最小権限",
+      "ALB のヘルスチェック設定",
+      "CloudWatch Logs へのログ出力"
+    ],
+    "costGotcha": "Fargate は vCPU／メモリ×実行時間で課金。常時起動タスクの台数・サイズの見直しが要る。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "vCPU",
+        "メモリ",
+        "実行時間"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "タスク定義は IaC 管理。",
+      "changeImpact": "タスク定義の更新でローリングデプロイ。",
+      "failover": "複数 AZ にタスクを分散。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/ecs/",
+      "pricing": "https://aws.amazon.com/ecs/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "lambda",
+    "name": "AWS Lambda",
+    "category": "compute",
+    "tier": 1,
+    "oneLiner": "イベントに応じてコードを実行するサーバーレス。サーバー管理不要で、使った分だけ課金。",
+    "mainUseCases": [
+      "イベント駆動処理（S3／DynamoDB／API）",
+      "軽い API バックエンド",
+      "定期バッチ・連携(グルー)処理"
+    ],
+    "notSuitableFor": [
+      "長時間・高スループットの常時処理",
+      "実行時間やメモリの上限を超える重い処理",
+      "コールドスタートが許容できない厳密な低レイテンシ"
+    ],
+    "companions": [
+      {
+        "serviceId": "iam",
+        "role": "実行ロール"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "ログ／メトリクス"
+      },
+      {
+        "serviceId": "s3",
+        "role": "トリガー／データ"
+      }
+    ],
+    "related": [
+      "ec2",
+      "ecs",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "ecs",
+      "ec2"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "logging"
+    ],
+    "productionPrereqs": [
+      "実行ロールの最小権限",
+      "タイムアウト／メモリの適正化",
+      "CloudWatch Logs での監視"
+    ],
+    "costGotcha": "リクエスト数×実行時間(GB-秒)で課金。高頻度・長時間実行では常時起動より割高になることがある。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "リクエスト数",
+        "実行時間(GB-秒)"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "コード／設定は IaC 管理。",
+      "changeImpact": "バージョン／エイリアスで段階デプロイ。",
+      "failover": "マネージドで複数 AZ。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/lambda/",
+      "pricing": "https://aws.amazon.com/lambda/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "aurora",
+    "name": "Amazon Aurora",
+    "category": "database",
+    "tier": 1,
+    "oneLiner": "MySQL／PostgreSQL 互換の高性能マネージド DB。RDS の上位で、ストレージは自動伸縮・高可用。",
+    "mainUseCases": [
+      "高性能が要る業務 DB",
+      "SaaS のマルチテナント DB",
+      "可用性を重視する本番 DB"
+    ],
+    "notSuitableFor": [
+      "小規模・低コスト最優先の用途（→ 通常の RDS）",
+      "RDBMS が不要な単純 KV（→ DynamoDB）"
+    ],
+    "companions": [
+      {
+        "serviceId": "ec2",
+        "role": "アプリ接続元"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク隔離"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "接続制御"
+      },
+      {
+        "serviceId": "iam",
+        "role": "IAM データベース認証"
+      }
+    ],
+    "related": [
+      "rds",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "rds",
+      "dynamodb"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "private サブネットへ配置",
+      "自動バックアップと保持期間の設定",
+      "マルチ AZ（ライター／リーダー）"
+    ],
+    "costGotcha": "インスタンス時間＋ストレージ／IO で課金。常時起動・リードレプリカ増設でコストが伸びやすい。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "インスタンス時間",
+        "ストレージ",
+        "I/O"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "自動バックアップ＋スナップショット。",
+      "changeImpact": "パラメータ／バージョン変更は再起動を伴うことがある。",
+      "failover": "マルチ AZ で自動フェイルオーバー。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/rds/aurora/",
+      "pricing": "https://aws.amazon.com/rds/aurora/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "nlb",
+    "name": "Network Load Balancer (NLB)",
+    "category": "networking",
+    "tier": 1,
+    "oneLiner": "L4（TCP／UDP／TLS）で動く高性能ロードバランサ。超低レイテンシ・大量接続向け。",
+    "mainUseCases": [
+      "TCP／UDP など非 HTTP の負荷分散",
+      "超低レイテンシ／大量接続",
+      "固定 IP が要る公開"
+    ],
+    "notSuitableFor": [
+      "パスやホスト名での振り分け（→ ALB）",
+      "HTTP ヘッダに基づく高度なルーティング"
+    ],
+    "companions": [
+      {
+        "serviceId": "ec2",
+        "role": "振り分け先"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク"
+      },
+      {
+        "serviceId": "acm",
+        "role": "TLS 終端時の証明書"
+      }
+    ],
+    "related": [
+      "alb",
+      "ec2",
+      "vpc"
+    ],
+    "alternatives": [
+      "alb"
+    ],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "productionPrereqs": [
+      "複数 AZ にターゲットを配置",
+      "ヘルスチェック設定",
+      "TLS 終端する場合は ACM 証明書"
+    ],
+    "costGotcha": "稼働時間＋処理量(NLCU)で課金。検証で立てたまま放置しない。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "稼働時間",
+        "処理量(NLCU)"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "リスナー／ターゲット変更は即時反映。",
+      "failover": "複数 AZ で冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/elasticloadbalancing/network-load-balancer/",
+      "pricing": "https://aws.amazon.com/elasticloadbalancing/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "nacl",
+    "name": "ネットワーク ACL (NACL)",
+    "category": "networking",
+    "tier": 1,
+    "oneLiner": "サブネット単位で通信を許可／拒否するステートレスなファイアウォール。セキュリティグループを補完する追加の防御層。",
+    "mainUseCases": [
+      "サブネット境界での粗い遮断",
+      "特定 IP レンジの拒否(deny)",
+      "セキュリティグループの補完（多層防御）"
+    ],
+    "notSuitableFor": [
+      "インスタンス単位の細かい制御（→ セキュリティグループ）",
+      "戻り通信が自動許可されるステートフルな制御"
+    ],
+    "companions": [
+      {
+        "serviceId": "vpc",
+        "role": "適用先（サブネット）"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "併用（多層防御）"
+      }
+    ],
+    "related": [
+      "securitygroup",
+      "vpc"
+    ],
+    "alternatives": [
+      "securitygroup"
+    ],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "productionPrereqs": [
+      "戻り通信用にエフェメラルポートを許可",
+      "ルール番号を増分で設計",
+      "既定は拒否前提で明示設計"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "低",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "ルールは IaC 管理。",
+      "changeImpact": "ルール変更はサブネット全体へ即時影響。",
+      "failover": ""
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/vpc/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
