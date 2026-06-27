@@ -6935,5 +6935,110 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "appflow",
+    "name": "Amazon AppFlow",
+    "category": "integration",
+    "oneLiner": "Salesforce などの SaaS と AWS（S3/Redshift 等）の間でデータを安全に連携する、ノーコードのマネージド統合サービス。",
+    "mainUseCases": [
+      "SaaS（Salesforce/Slack/Zendesk 等）から S3/Redshift へのデータ取り込み",
+      "オンデマンド/スケジュールでのデータ同期",
+      "複数 SaaS データの集約（分析の前処理）"
+    ],
+    "notSuitableFor": [
+      "AWS 内部の汎用 ETL・変換（それは Glue）",
+      "イベントのルーティング・配信そのもの（それは EventBridge）"
+    ],
+    "productionPrereqs": [
+      "接続先 SaaS の認証情報（コネクタ設定）",
+      "格納先（S3/Redshift 等）",
+      "IAM 権限・必要なら PrivateLink"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "フロー実行回数・処理データ量"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "s3",
+      "glue",
+      "eventbridge",
+      "redshift"
+    ],
+    "alternatives": [
+      "glue"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/appflow/latest/userguide/what-is-appflow.html",
+      "pricing": "https://aws.amazon.com/appflow/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "mwaa",
+    "name": "Amazon Managed Workflows for Apache Airflow (MWAA)",
+    "category": "integration",
+    "oneLiner": "Apache Airflow をマネージドで提供し、Python の DAG でデータパイプラインを定義・スケジュール・監視するワークフロー基盤。",
+    "mainUseCases": [
+      "ETL/データパイプラインのオーケストレーション",
+      "依存関係のある複数ステップのバッチ処理のスケジュール実行",
+      "既存 Airflow 資産（DAG）のマネージド移行"
+    ],
+    "notSuitableFor": [
+      "AWS ネイティブのサーバーレスなワークフロー制御（それは Step Functions）",
+      "単純な定期実行だけ（それは EventBridge Scheduler 等で十分）"
+    ],
+    "productionPrereqs": [
+      "VPC とサブネット（Airflow は VPC 内で稼働）",
+      "DAG 置き場の S3 バケット",
+      "IAM 実行ロール・環境クラスの選定"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "環境の稼働時間・ワーカー数・ストレージ"
+      ],
+      "relative": "中〜高"
+    },
+    "related": [
+      "stepfunctions",
+      "glue",
+      "s3",
+      "emr"
+    ],
+    "alternatives": [
+      "stepfunctions"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html",
+      "pricing": "https://aws.amazon.com/managed-workflows-for-apache-airflow/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
