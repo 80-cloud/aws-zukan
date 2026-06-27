@@ -5284,5 +5284,262 @@
         "gotcha": "Interface 型（PrivateLink）は SSM・ECR など多くの AWS サービス向けで、subnet に ENI を作る。時間課金＋データ処理料がかかるため、NAT 回避のつもりでも対象サービスが多いと割高になりうる。セキュリティグループで 443 を許可し、private DNS を使うなら VPC の DNS hostnames/resolution を有効にする。"
       }
     ]
+  },
+  {
+    "id": "autoscaling",
+    "name": "Amazon EC2 Auto Scaling",
+    "category": "compute",
+    "oneLiner": "EC2 を Auto Scaling グループ単位で扱い、需要に応じて台数を自動で増減・置換する。",
+    "mainUseCases": [
+      "負荷に応じた台数の自動増減",
+      "停止・不調インスタンスの自動置換で台数維持",
+      "複数 AZ への均等配置"
+    ],
+    "notSuitableFor": [
+      "コンテナ単位のスケール（ECS/Fargate のサービス Auto Scaling が担当）",
+      "台数が常に固定で増減が要らない構成"
+    ],
+    "productionPrereqs": [
+      "launch template",
+      "min/max/desired の設計",
+      "ELB ヘルスチェック連携"
+    ],
+    "commonRuleRefs": [
+      "monitoring",
+      "cost",
+      "tagging"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "EC2/EBS/CloudWatch など利用分のみ（Auto Scaling 自体は無料）"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ec2",
+      "alb",
+      "cloudwatch"
+    ],
+    "alternatives": [
+      "ecs",
+      "fargate"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+      "pricing": "https://aws.amazon.com/ec2/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "rdsproxy",
+    "name": "Amazon RDS Proxy",
+    "category": "database",
+    "oneLiner": "RDS/Aurora の前段に置く接続プール。多数の短命接続をまとめ、DB の接続枯渇を防ぐ。",
+    "mainUseCases": [
+      "Lambda など接続が急増する構成の接続プール",
+      "フェイルオーバー時に接続を維持して復旧を速める",
+      "IAM 認証・Secrets Manager 経由の接続集約"
+    ],
+    "notSuitableFor": [
+      "EC2 上の自前管理 DB（対象は RDS/Aurora 管理インスタンス）",
+      "リードレプリカへの直接プロキシ（ライターのみ対応）"
+    ],
+    "productionPrereqs": [
+      "DB と同一 VPC（プロキシは公開不可）",
+      "Secrets Manager または IAM 認証",
+      "接続上限の設計"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "対象 DB の vCPU あたり時間課金"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "rds",
+      "aurora",
+      "lambda"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+      "pricing": "https://aws.amazon.com/rds/proxy/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "dms",
+    "name": "AWS Database Migration Service",
+    "category": "database",
+    "oneLiner": "DB やデータストアを AWS へ／間で移行する。一度きりの移行も、変更を継続反映する複製もできる。",
+    "mainUseCases": [
+      "オンプレ→AWS の DB 移行",
+      "異種エンジン間の移行（スキーマ変換と併用）",
+      "継続レプリケーション（CDC）で停止時間を最小化"
+    ],
+    "notSuitableFor": [
+      "常時稼働の本番処理基盤（用途は移行・複製）",
+      "アプリのリアルタイム処理そのもの"
+    ],
+    "productionPrereqs": [
+      "レプリケーションインスタンス",
+      "source/target エンドポイント",
+      "異種移行ならスキーマ変換"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "レプリケーションインスタンスの稼働時間・ストレージ"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "rds",
+      "aurora",
+      "s3"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html",
+      "pricing": "https://aws.amazon.com/dms/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "amazonmq",
+    "name": "Amazon MQ",
+    "category": "integration",
+    "oneLiner": "ActiveMQ / RabbitMQ のマネージドメッセージブローカー。標準プロトコルで既存資産を載せ替えられる。",
+    "mainUseCases": [
+      "既存の ActiveMQ/RabbitMQ をコード変更なしで移行",
+      "JMS/AMQP/MQTT 等の標準プロトコルが必要な連携",
+      "アプリ間の非同期メッセージング"
+    ],
+    "notSuitableFor": [
+      "新規でクラウドネイティブに作るなら低運用な SQS/SNS が向く（MQ は既存資産・標準プロトコル重視のとき）"
+    ],
+    "productionPrereqs": [
+      "VPC 内のプライベートエンドポイント",
+      "冗長構成（Active/Standby・Quorum queue）",
+      "メンテナンスウィンドウ設計"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ブローカーインスタンスの稼働時間・ストレージ"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "sqs",
+      "sns"
+    ],
+    "alternatives": [
+      "sqs",
+      "sns"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/welcome.html",
+      "pricing": "https://aws.amazon.com/amazon-mq/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "globalaccelerator",
+    "name": "AWS Global Accelerator",
+    "category": "networking",
+    "oneLiner": "AWS のグローバル網と固定 Anycast IP で、世界中のユーザーを最寄り Region のエンドポイントへ最短経路で届ける。",
+    "mainUseCases": [
+      "グローバルユーザー向けの低遅延・高可用な入口",
+      "固定 IP（Anycast）が必要な構成",
+      "Region/AZ 障害時の即時フェイルオーバー"
+    ],
+    "notSuitableFor": [
+      "静的コンテンツのキャッシュ配信（それは CloudFront）",
+      "単一 Region・国内中心で固定 IP も要らない構成"
+    ],
+    "productionPrereqs": [
+      "ALB/NLB/EC2/EIP のエンドポイント",
+      "ヘルスチェック",
+      "必要なら複数 Region"
+    ],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "アクセラレータの固定時間料金＋データ転送プレミアム"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "alb",
+      "nlb",
+      "cloudfront"
+    ],
+    "alternatives": [
+      "cloudfront",
+      "route53"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html",
+      "pricing": "https://aws.amazon.com/global-accelerator/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
