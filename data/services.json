@@ -3482,5 +3482,506 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "fargate",
+    "name": "AWS Fargate",
+    "category": "compute",
+    "tier": 1,
+    "oneLiner": "コンテナをサーバー管理なしで動かすサーバーレスなコンテナ実行基盤。ECS／EKS の実行先として使う。",
+    "mainUseCases": [
+      "ECS／EKS のサーバーレス実行",
+      "Web／API／マイクロサービス",
+      "バッチ／データ処理"
+    ],
+    "notSuitableFor": [
+      "ノード／OS を細かく制御したい（→ EC2 起動タイプ）",
+      "GPU 等の特殊ハードが要る一部用途"
+    ],
+    "companions": [
+      {
+        "serviceId": "ecs",
+        "role": "実行先"
+      },
+      {
+        "serviceId": "eks",
+        "role": "実行先"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "イメージ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "タスクロール"
+      }
+    ],
+    "related": [
+      "ecs",
+      "eks",
+      "lambda"
+    ],
+    "alternatives": [
+      "ec2"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "productionPrereqs": [
+      "タスクの vCPU／メモリ適正化",
+      "タスク実行ロールの最小権限",
+      "Spot／Savings Plans でコスト最適化"
+    ],
+    "costGotcha": "vCPU／メモリ×実行時間で課金。常時起動タスクの台数・サイズに注意。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "vCPU",
+        "メモリ",
+        "実行時間"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "タスク定義は IaC 管理。",
+      "changeImpact": "タスク定義の更新でローリングデプロイ。",
+      "failover": "複数 AZ にタスク分散。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/fargate/",
+      "pricing": "https://aws.amazon.com/fargate/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "xray",
+    "name": "AWS X-Ray",
+    "category": "monitoring",
+    "tier": 1,
+    "oneLiner": "リクエストがサービス間をどう流れたかを追う分散トレーシング。ボトルネックや遅延の特定に使う。",
+    "mainUseCases": [
+      "サービス横断のトレース可視化",
+      "遅延／ボトルネックの特定",
+      "マイクロサービスの依存把握"
+    ],
+    "notSuitableFor": [
+      "メトリクス／ログの収集主体（→ CloudWatch）",
+      "計装なしでの自動取得（計装が要る）"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "計装／連携"
+      },
+      {
+        "serviceId": "apigateway",
+        "role": "トレース"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "統合"
+      }
+    ],
+    "related": [
+      "cloudwatch",
+      "lambda"
+    ],
+    "alternatives": [
+      "cloudwatch"
+    ],
+    "commonRuleRefs": [
+      "logging",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "アプリの計装（SDK／エージェント）",
+      "サンプリング設計",
+      "IAM 権限"
+    ],
+    "costGotcha": "記録／取得したトレース数で課金。サンプリングで量を制御する。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "記録トレース数",
+        "取得／スキャン数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "サンプリング変更は取得量に影響。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/xray/",
+      "pricing": "https://aws.amazon.com/xray/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "costexplorer",
+    "name": "AWS Cost Explorer",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "AWS の利用料金と使用量を可視化・分析・予測するツール。コストの傾向や要因を把握する。",
+    "mainUseCases": [
+      "コスト／使用量の分析（フィルタ／グループ化）",
+      "将来コストの予測",
+      "異常な増加の把握"
+    ],
+    "notSuitableFor": [
+      "リアルタイムのコスト監視（更新は約24時間ごと）",
+      "即時の請求反映"
+    ],
+    "companions": [
+      {
+        "serviceId": "budgets",
+        "role": "予算アラート"
+      },
+      {
+        "serviceId": "organizations",
+        "role": "一括請求の分析"
+      }
+    ],
+    "related": [
+      "budgets",
+      "organizations"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [],
+    "productionPrereqs": [
+      "コスト配賦タグの設計",
+      "レポート／予測の活用",
+      "アクセス権限の管理"
+    ],
+    "costGotcha": "有償 API 利用（リクエスト課金）あり。コンソール表示は基本無料。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "API リクエスト"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "レポート定義は IaC 管理。",
+      "changeImpact": "設定変更は表示に反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+      "pricing": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "budgets",
+    "name": "AWS Budgets",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "コスト／使用量に予算を設定し、しきい値超過でアラートや自動アクションを出すサービス。誤課金の早期検知に使う。",
+    "mainUseCases": [
+      "予算超過アラート（誤課金防止）",
+      "予実レポート",
+      "しきい値での自動アクション"
+    ],
+    "notSuitableFor": [
+      "詳細なコスト要因分析（→ Cost Explorer）",
+      "性能／リソース最適化"
+    ],
+    "companions": [
+      {
+        "serviceId": "costexplorer",
+        "role": "分析"
+      },
+      {
+        "serviceId": "sns",
+        "role": "通知"
+      },
+      {
+        "serviceId": "organizations",
+        "role": "横断管理"
+      }
+    ],
+    "related": [
+      "costexplorer",
+      "organizations"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [],
+    "productionPrereqs": [
+      "予算しきい値／通知先(SNS)設定",
+      "予測ベースのアラート",
+      "アカウント横断の集約"
+    ],
+    "costGotcha": "一定数の予算は無料、超過分は予算あたり課金。自動アクション連携の前提に注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "予算数（無料枠超過分）"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "予算定義は IaC 管理。",
+      "changeImpact": "しきい値変更は次回評価から反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+      "pricing": "https://aws.amazon.com/aws-cost-management/aws-budgets/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "inspector",
+    "name": "Amazon Inspector",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "EC2／コンテナイメージ／Lambda の脆弱性を継続的に自動スキャンする脆弱性管理サービス。",
+    "mainUseCases": [
+      "EC2／ECR イメージ／Lambda の脆弱性検出",
+      "リスクスコアでの優先度付け",
+      "コンプライアンス対応"
+    ],
+    "notSuitableFor": [
+      "振る舞い／脅威の検知（→ GuardDuty）",
+      "インシデント対応の全代替"
+    ],
+    "companions": [
+      {
+        "serviceId": "ec2",
+        "role": "スキャン対象"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "スキャン対象"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "スキャン対象"
+      }
+    ],
+    "related": [
+      "ecr",
+      "guardduty"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "スキャン対象の有効化",
+      "検出結果の対応フロー",
+      "マルチアカウント集約"
+    ],
+    "costGotcha": "スキャンした対象数／イメージ数で課金。対象を広げると増える。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "スキャン対象数",
+        "イメージ再スキャン"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "有効化／対象変更は即時。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/inspector/",
+      "pricing": "https://aws.amazon.com/inspector/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "macie",
+    "name": "Amazon Macie",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "S3 内の個人情報など機微データを ML／パターンで発見・可視化するデータセキュリティサービス。",
+    "mainUseCases": [
+      "S3 の機微データ(PII)発見",
+      "データ保護のコンプライアンス",
+      "移行／取り込み時の点検"
+    ],
+    "notSuitableFor": [
+      "S3 以外／オンプレのデータ（対象は S3 中心）",
+      "脅威の検知（→ GuardDuty）"
+    ],
+    "companions": [
+      {
+        "serviceId": "s3",
+        "role": "スキャン対象"
+      },
+      {
+        "serviceId": "kms",
+        "role": "暗号化"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "s3",
+      "guardduty"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "encryption",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "対象バケットの選定",
+      "検出ジョブのスケジュール",
+      "結果の対応フロー"
+    ],
+    "costGotcha": "評価したバケット数＋検査したデータ量で課金。広範スキャンは高くなりやすい。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "評価バケット数",
+        "検査データ量"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "ジョブ／対象変更は次回実行から反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/macie/",
+      "pricing": "https://aws.amazon.com/macie/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
