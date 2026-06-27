@@ -6529,5 +6529,106 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "transcribe",
+    "name": "Amazon Transcribe",
+    "category": "ai",
+    "oneLiner": "音声を文字に変換する自動音声認識（ASR）のマネージドAPI。リアルタイム（ストリーミング）とファイル（バッチ）に対応。",
+    "mainUseCases": [
+      "通話・会議・動画の文字起こし",
+      "字幕・キャプションの自動生成",
+      "話者分離やコールセンター分析の前処理"
+    ],
+    "notSuitableFor": [
+      "文字を音声に変換（それは Polly）",
+      "文章の意味・感情の解析（それは Comprehend）",
+      "会話の意図理解・対話制御（それは Lex）"
+    ],
+    "productionPrereqs": [
+      "バッチは S3 上の音声ファイル",
+      "IAM 権限",
+      "必要ならカスタム語彙・PII マスキング設定"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "文字起こしした音声の秒数"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "comprehend",
+      "translate",
+      "polly"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/transcribe/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "lex",
+    "name": "Amazon Lex",
+    "category": "ai",
+    "oneLiner": "音声とテキストで対話するチャットボット（会話インターフェース）を構築するマネージドサービス。ASR と自然言語理解（NLU）を内蔵。",
+    "mainUseCases": [
+      "カスタマーサポート・IT ヘルプデスクの自動応答",
+      "予約・注文・問い合わせの対話ボット",
+      "Slack/Teams/Web 等への会話インターフェース組み込み"
+    ],
+    "notSuitableFor": [
+      "単なる音声→文字（それは Transcribe）／文字→音声（それは Polly）",
+      "自由な生成対話・大規模言語モデルそのもの（それは Bedrock）"
+    ],
+    "productionPrereqs": [
+      "インテント/スロットの設計",
+      "Lambda 連携（業務ロジック実行）",
+      "チャネル（Web/Slack 等）の接続"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "テキスト/音声リクエスト数"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "lambda",
+      "polly",
+      "comprehend"
+    ],
+    "alternatives": [
+      "bedrock"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/lexv2/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/lex/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
