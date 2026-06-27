@@ -6068,5 +6068,257 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "comprehend",
+    "name": "Amazon Comprehend",
+    "category": "ai",
+    "oneLiner": "テキストから感情・固有表現・キーフレーズ・言語などを抽出する自然言語処理（NLP）のマネージドAPI。",
+    "mainUseCases": [
+      "レビュー/SNS の感情分析",
+      "文書からの固有表現・キーフレーズ・PII 抽出",
+      "言語判定・トピック分類（カスタムモデルも可）"
+    ],
+    "notSuitableFor": [
+      "対話生成や要約など生成AI用途（それは Bedrock 等）",
+      "ML の細かい自前学習・推論基盤（それは SageMaker）"
+    ],
+    "productionPrereqs": [
+      "大量なら S3 入出力と非同期ジョブ",
+      "IAM 権限",
+      "KMS 暗号化（出力/ボリューム）"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "解析した文字量・カスタムモデルの学習/管理"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "bedrock",
+      "sagemaker",
+      "translate"
+    ],
+    "alternatives": [
+      "bedrock"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/comprehend/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "rekognition",
+    "name": "Amazon Rekognition",
+    "category": "ai",
+    "oneLiner": "画像・動画から物体/シーン/テキスト/顔などを検出・分析するコンピュータビジョンのマネージドAPI。",
+    "mainUseCases": [
+      "画像/動画のラベル付け・検索インデックス",
+      "顔の比較による本人確認・なりすまし検知",
+      "不適切コンテンツのモデレーション"
+    ],
+    "notSuitableFor": [
+      "生成系の画像処理（用途は分析・検出）",
+      "完全に独自の高度モデルを自前運用したい場合（SageMaker）"
+    ],
+    "productionPrereqs": [
+      "S3 上の画像/動画",
+      "IAM 権限",
+      "顔検索なら face collection の設計"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "処理した画像/動画の量"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "sagemaker",
+      "bedrock",
+      "s3"
+    ],
+    "alternatives": [
+      "sagemaker"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/rekognition/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "textract",
+    "name": "Amazon Textract",
+    "category": "ai",
+    "oneLiner": "文書（PDF/画像）から文字・フォーム・表を抽出する、OCR を超えたドキュメント解析のマネージドAPI。",
+    "mainUseCases": [
+      "フォーム/帳票からの構造化データ抽出",
+      "請求書・領収書・ID 書類の読み取り",
+      "検索インデックスや NLP の前処理"
+    ],
+    "notSuitableFor": [
+      "自然言語の意味解析（それは Comprehend）",
+      "対応外フォーマットへの過度な期待"
+    ],
+    "productionPrereqs": [
+      "S3 上の文書（複数ページは非同期）",
+      "IAM 権限",
+      "クォータ（処理速度）の確認"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "解析したページ数"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "comprehend",
+      "s3",
+      "sagemaker"
+    ],
+    "alternatives": [
+      "comprehend"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/textract/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "polly",
+    "name": "Amazon Polly",
+    "category": "ai",
+    "oneLiner": "テキストを自然な音声に変換する Text-to-Speech のマネージドAPI（多言語・多様な声）。",
+    "mainUseCases": [
+      "読み上げ・ニュース/eラーニング",
+      "アクセシビリティ（視覚障害者向け読み上げ）",
+      "IoT/ゲーム/モバイルの音声化"
+    ],
+    "notSuitableFor": [
+      "音声からテキスト（それは Transcribe）",
+      "会話AIの意味理解そのもの"
+    ],
+    "productionPrereqs": [
+      "IAM 権限",
+      "声/エンジン（generative/neural/standard）の選択",
+      "必要なら生成音声のキャッシュ"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "合成した文字量"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "translate",
+      "bedrock"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/polly/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/polly/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "translate",
+    "name": "Amazon Translate",
+    "category": "ai",
+    "oneLiner": "機械学習による高品質なテキスト翻訳をオンデマンドで行うマネージドAPI。",
+    "mainUseCases": [
+      "アプリ/コンテンツの多言語化",
+      "メール・チャットなど対人コミュニケーションの翻訳",
+      "多言語データの分析・検索の前処理"
+    ],
+    "notSuitableFor": [
+      "専門分野で完璧な訳が必須の用途（カスタム用語の併用前提）",
+      "音声翻訳そのもの（Transcribe/Polly と組み合わせ）"
+    ],
+    "productionPrereqs": [
+      "IAM 権限",
+      "必要ならカスタム用語集",
+      "S3/Lambda 等との連携"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "翻訳した文字量"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "comprehend",
+      "polly",
+      "bedrock"
+    ],
+    "alternatives": [
+      "bedrock"
+    ],
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/translate/latest/dg/what-is.html",
+      "pricing": "https://aws.amazon.com/translate/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
