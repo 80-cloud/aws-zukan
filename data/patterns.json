@@ -113,5 +113,388 @@
     "realWorldNotes": [
       { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "一周目に手作業で踏んだ罠(arm64/amd64・localhost・鍵)を、二周目は user_data の自動化で先回りして全部避けた。" }
     ]
+  },
+  {
+    "id": "pat-serverless-api",
+    "name": "サーバーレス API",
+    "goal": "サーバー管理なしで REST／HTTP API を提供する",
+    "recommendedStack": [
+      "apigateway",
+      "lambda",
+      "dynamodb"
+    ],
+    "rationale": "常時稼働サーバーを持たず、リクエストに応じて自動スケールする。運用負荷とコストを抑えやすく、小〜中規模の API を素早く立ち上げられる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "低頻度の API に常時起動の EC2 を充てると、稼働コストと OS 運用の負荷が相対的に過大になりやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "認証・認可",
+      "アクセスログ（CloudWatch）",
+      "IAM 最小権限"
+    ],
+    "optional": [
+      "WAF",
+      "Cognito 認証",
+      "X-Ray トレース"
+    ],
+    "suitableConditions": [
+      "トラフィックの変動が大きい",
+      "小〜中規模の API",
+      "運用人員が少ない"
+    ],
+    "alternatives": [
+      "ALB + ECS/Fargate",
+      "ALB + EC2"
+    ],
+    "notes": "重い同期処理や長時間処理はサーバーレスに不向きな場合がある。",
+    "difficulty": 2,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "◎",
+      "cost": "◎",
+      "scalability": "◎",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "勉強用デプロイ",
+      "スタートアップ MVP"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "apigateway",
+        "role": "API の入口・認可"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "ビジネスロジック"
+      },
+      {
+        "serviceId": "dynamodb",
+        "role": "データ保存"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-container-prod",
+    "name": "コンテナの本番運用",
+    "goal": "コンテナ化したアプリを可用性高く本番運用する",
+    "recommendedStack": [
+      "alb",
+      "ecs",
+      "fargate",
+      "rds"
+    ],
+    "rationale": "ALB で負荷分散し、Fargate でサーバー管理なくコンテナを実行、RDS で永続化する。スケールと運用負荷のバランスが取りやすい標準構成。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "自前で EC2 にコンテナを載せて運用すると、OS パッチ・スケール・監視の運用負荷が高くなりやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "HTTPS（ACM）",
+      "プライベートサブネット配置",
+      "IAM タスクロール",
+      "アクセスログ"
+    ],
+    "optional": [
+      "WAF",
+      "Auto Scaling",
+      "CI/CD（CodePipeline）"
+    ],
+    "suitableConditions": [
+      "アプリがコンテナ化済み",
+      "安定的な本番トラフィック",
+      "スケールが要る"
+    ],
+    "alternatives": [
+      "ALB + EC2",
+      "Amazon EKS"
+    ],
+    "notes": "Kubernetes 標準が要件なら EKS を検討する。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "オンプレ移行"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "alb",
+        "role": "ロードバランサ・HTTPS 終端"
+      },
+      {
+        "serviceId": "ecs",
+        "role": "オーケストレーション"
+      },
+      {
+        "serviceId": "fargate",
+        "role": "コンテナ実行基盤"
+      },
+      {
+        "serviceId": "rds",
+        "role": "データベース"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク（public/private）"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "通信制御"
+      }
+    ]
+  },
+  {
+    "id": "pat-event-driven",
+    "name": "イベント駆動の非同期処理",
+    "goal": "イベントを非同期に受けて疎結合に処理する",
+    "recommendedStack": [
+      "eventbridge",
+      "sqs",
+      "lambda"
+    ],
+    "rationale": "EventBridge／SQS で受けて Lambda で処理し、送信側と処理側を切り離す。負荷の波に強く、失敗時の再試行も組みやすい。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "常時ポーリングする自前ワーカーを EC2 で持つと、待機中も課金され運用負荷も増える。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "DLQ（失敗の退避）",
+      "IAM 最小権限",
+      "ログ・監視"
+    ],
+    "optional": [
+      "SNS 通知",
+      "Step Functions（複雑フロー）"
+    ],
+    "suitableConditions": [
+      "非同期でよい処理",
+      "負荷の波がある",
+      "疎結合にしたい"
+    ],
+    "alternatives": [
+      "AWS Step Functions",
+      "Amazon Kinesis（ストリーム向け）"
+    ],
+    "notes": "厳密な順序や大量ストリームは Kinesis が向く場合がある。",
+    "difficulty": 2,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "◎",
+      "cost": "◎",
+      "scalability": "◎",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "非同期処理",
+      "スケール対応"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "eventbridge",
+        "role": "イベントのルーティング"
+      },
+      {
+        "serviceId": "sqs",
+        "role": "緩衝キュー"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "処理"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-data-lake",
+    "name": "データレイク分析",
+    "goal": "S3 のデータを SQL で分析する基盤を作る",
+    "recommendedStack": [
+      "s3",
+      "glue",
+      "athena"
+    ],
+    "rationale": "S3 にデータを集約し、Glue でカタログ化、Athena で SQL 分析する。サーバーレスで安価に始められ、規模に応じて拡張できる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "rds"
+        ],
+        "why": "大規模な分析クエリを OLTP 向けの RDS で回すと、性能とコストが見合わなくなりやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "暗号化",
+      "IAM・アクセス制御",
+      "データの列指向化／分割"
+    ],
+    "optional": [
+      "Amazon Redshift（大規模 DWH）",
+      "Lake Formation（権限管理）"
+    ],
+    "suitableConditions": [
+      "分析対象が S3 にある",
+      "アドホック分析",
+      "まず安価に始めたい"
+    ],
+    "alternatives": [
+      "Amazon Redshift（本格 DWH）",
+      "Amazon OpenSearch（検索／ログ）"
+    ],
+    "notes": "恒常的な高頻度・大規模分析は Redshift が向く場合がある。",
+    "difficulty": 2,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "◎",
+      "cost": "◎",
+      "scalability": "◎",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "データ分析",
+      "ログ分析"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "s3",
+        "role": "データ保管"
+      },
+      {
+        "serviceId": "glue",
+        "role": "ETL・データカタログ"
+      },
+      {
+        "serviceId": "athena",
+        "role": "SQL クエリ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-multi-account-governance",
+    "name": "マルチアカウント統制基盤",
+    "goal": "複数 AWS アカウントを安全に統制する土台を作る",
+    "recommendedStack": [
+      "organizations",
+      "cloudtrail",
+      "config",
+      "securityhub"
+    ],
+    "rationale": "Organizations で OU／SCP を効かせ、CloudTrail で監査、Config で構成準拠を評価、Security Hub で検出を集約する。統制を仕組みで担保する。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "iam"
+        ],
+        "why": "単一アカウント＋IAM だけで多部門を分離しようとすると、権限分離・課金配賦・障害影響範囲の管理が破綻しやすい。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "全リージョンの CloudTrail",
+      "ログ用アカウントの分離",
+      "SCP ガードレール"
+    ],
+    "optional": [
+      "Amazon GuardDuty",
+      "集中ログバケット",
+      "AWS Control Tower（将来）"
+    ],
+    "suitableConditions": [
+      "複数アカウント運用",
+      "監査・コンプライアンス要件",
+      "統制を効かせたい"
+    ],
+    "alternatives": [
+      "AWS Control Tower（統制の自動化）"
+    ],
+    "notes": "小規模・単一アカウントには過剰になりやすい。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "△",
+      "cost": "○",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "△",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "マルチアカウント統制",
+      "監査／コンプライアンス"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "organizations",
+        "role": "アカウント統治・SCP"
+      },
+      {
+        "serviceId": "cloudtrail",
+        "role": "監査ログ"
+      },
+      {
+        "serviceId": "config",
+        "role": "構成準拠の評価"
+      },
+      {
+        "serviceId": "securityhub",
+        "role": "検出の集約"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限の土台"
+      }
+    ]
   }
 ]
