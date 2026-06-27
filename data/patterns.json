@@ -1639,5 +1639,167 @@
         "role": "拠点内で動くアプリ"
       }
     ]
+  },
+  {
+    "id": "pat-disaster-recovery",
+    "name": "災害対策（DR・リージョン障害への備え）",
+    "goal": "リージョン規模の障害に備え、目標復旧時間／復旧時点（RTO／RPO）に応じた復旧構成を用意する",
+    "recommendedStack": [
+      "backup",
+      "s3",
+      "aurora",
+      "route53",
+      "cloudformation"
+    ],
+    "rationale": "DR は「バックアップ＆リストア → パイロットライト → ウォームスタンバイ → マルチサイト」という連続したスペクトラムで、コストと復旧速度（RTO／RPO）がトレードオフになる。AWS Backup でバックアップを別リージョン・別アカウントへコピーし、S3 はクロスリージョンレプリケーション、データベースは Aurora グローバルデータベース等で継続的に複製する。切替は Route53 のヘルスチェックによる DNS フェイルオーバー（データプレーン操作で信頼性が高い）で行い、復旧先のインフラは CloudFormation などの IaC で素早く再構築する。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "s3"
+        ],
+        "why": "バックアップを本番と同一リージョン・同一アカウントだけに置くと、リージョン障害やアカウント侵害の際に本番もバックアップも同時に失いやすい。別リージョン・別アカウントへのコピーが前提。",
+        "source": null
+      },
+      {
+        "stack": [
+          "route53"
+        ],
+        "why": "重み付けの手動変更などコントロールプレーン操作だけに依存したフェイルオーバーは、広域障害時に動かないことがある。ヘルスチェックによるデータプレーンのフェイルオーバーが向く。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "バックアップの別リージョン／別アカウント保管",
+      "定期的な復旧テスト",
+      "IaC による復旧先の再現性",
+      "暗号化"
+    ],
+    "optional": [
+      "Aurora グローバルデータベース（低 RPO）",
+      "CloudFront オリジンフェイルオーバー",
+      "DynamoDB グローバルテーブル"
+    ],
+    "suitableConditions": [
+      "リージョン規模の障害まで備える",
+      "規制で DR 要件がある",
+      "明確な RTO／RPO 目標がある"
+    ],
+    "alternatives": [
+      "単一リージョン＋マルチ AZ（データセンター障害までの可用性）",
+      "マネージドの Elastic Disaster Recovery"
+    ],
+    "notes": "RTO／RPO の要件次第で戦略を選ぶ。near-zero を狙うほどコストと複雑さが増す。バックアップは取得だけでなく定期的な復元テストまで含める。",
+    "difficulty": 4,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "△",
+      "cost": "△",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "災害対策／DR",
+      "監査／コンプライアンス"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "backup",
+        "role": "横断バックアップ・別リージョン／別アカウントへコピー"
+      },
+      {
+        "serviceId": "s3",
+        "role": "クロスリージョンレプリケーションでデータ複製"
+      },
+      {
+        "serviceId": "aurora",
+        "role": "グローバルデータベースで低 RPO の継続複製"
+      },
+      {
+        "serviceId": "route53",
+        "role": "ヘルスチェックによる DNS フェイルオーバー"
+      },
+      {
+        "serviceId": "cloudformation",
+        "role": "復旧先インフラを IaC で再構築"
+      }
+    ]
+  },
+  {
+    "id": "pat-migration",
+    "name": "クラウド移行（DB・ファイル・サーバー）",
+    "goal": "オンプレや他環境の DB・ファイル・サーバーを、停止時間を抑えて AWS へ移行する",
+    "recommendedStack": [
+      "dms",
+      "datasync",
+      "mgn",
+      "s3"
+    ],
+    "rationale": "移行対象ごとに道具を使い分ける。データベースは DMS で継続レプリケーション（CDC）し、ソースを稼働させたまま最小停止で切り替える。異種エンジン間はスキーマ変換ツール（SCT）でスキーマを変換する。ファイル／オブジェクトは DataSync で NFS／SMB から S3／EFS／FSx へ高速・安全に転送する。サーバー丸ごとは Application Migration Service（MGN）でブロックレベル複製してリフト＆シフトする。移行を機に RDS／Aurora などマネージドへモダナイズもできる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "dms"
+        ],
+        "why": "大量のファイルやオブジェクトを DMS で運ぼうとすると不向き。ファイルは DataSync、サーバー丸ごとは MGN と、対象ごとに道具を分けるのが前提。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "移行中の暗号化（KMS／SSL）",
+      "切替計画とロールバック手順",
+      "移行後のデータ検証"
+    ],
+    "optional": [
+      "スキーマ変換ツール（異種エンジン移行）",
+      "DMS Fleet Advisor（移行候補の棚卸し）",
+      "モダナイズ先 RDS／Aurora／Redshift"
+    ],
+    "suitableConditions": [
+      "オンプレや他クラウドから AWS へ移したい",
+      "移行中の停止時間を抑えたい",
+      "異種データベースエンジンへ移行したい"
+    ],
+    "alternatives": [
+      "手動の dump／restore（小規模・短時間停止が許容できる場合）",
+      "Storage Gateway（移行せずハイブリッドで継続利用）"
+    ],
+    "notes": "一括の切替よりも、継続レプリケーションで差分を追従してから短時間で切り替える方が停止時間を抑えやすい。移行後の検証と旧環境の停止までを計画に含める。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "○",
+      "opsLoad": "△",
+      "cost": "○",
+      "scalability": "○",
+      "governanceFit": "○",
+      "migrationEase": "◎",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "オンプレ移行"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "dms",
+        "role": "DB を継続レプリケーション（CDC）で最小停止移行"
+      },
+      {
+        "serviceId": "datasync",
+        "role": "ファイル／オブジェクトを高速転送（NFS／SMB → S3／EFS／FSx）"
+      },
+      {
+        "serviceId": "mgn",
+        "role": "サーバーをブロックレベル複製でリフト＆シフト"
+      },
+      {
+        "serviceId": "s3",
+        "role": "移行データの受け皿・アーカイブ"
+      }
+    ]
   }
 ]
