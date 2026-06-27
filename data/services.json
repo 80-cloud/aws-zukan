@@ -6320,5 +6320,109 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "grafana",
+    "name": "Amazon Managed Grafana",
+    "category": "monitoring",
+    "oneLiner": "メトリクス・ログ・トレースを複数のデータソースから集めて可視化する、マネージドな Grafana。",
+    "mainUseCases": [
+      "複数ソース横断の運用ダッシュボード（CloudWatch/Prometheus/OpenSearch/X-Ray 等）",
+      "オープンソース Grafana のダッシュボード資産をそのまま運用",
+      "SAML / IAM Identity Center による SSO つきの可視化基盤"
+    ],
+    "notSuitableFor": [
+      "メトリクスの収集・保存そのもの（可視化専用＝データソースは別に必要）",
+      "単一の AWS メトリクスを手軽に見るだけなら CloudWatch ダッシュボードで十分"
+    ],
+    "productionPrereqs": [
+      "workspace の作成",
+      "各データソースへの接続権限（IAM）",
+      "SSO/IdP（SAML or IAM Identity Center）の設定"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "workspace のアクティブユーザー数"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "cloudwatch",
+      "prometheus",
+      "xray"
+    ],
+    "alternatives": [
+      "cloudwatch"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/grafana/latest/userguide/what-is-Amazon-Managed-Service-Grafana.html",
+      "pricing": "https://aws.amazon.com/grafana/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "prometheus",
+    "name": "Amazon Managed Service for Prometheus",
+    "category": "monitoring",
+    "oneLiner": "Prometheus 互換のサーバーレスなメトリクス監視。コンテナ環境を PromQL でスケーラブルに監視する。",
+    "mainUseCases": [
+      "EKS / 自己管理 Kubernetes のコンテナメトリクス監視",
+      "既存の Prometheus / PromQL 資産をマネージドへ移行",
+      "大規模・高可用（マルチAZ）なメトリクスの保存とクエリ"
+    ],
+    "notSuitableFor": [
+      "可視化ダッシュボードそのもの（Grafana 等と組み合わせる）",
+      "コンテナ以外の一般的な AWS メトリクス収集だけなら CloudWatch で足りる"
+    ],
+    "productionPrereqs": [
+      "workspace の作成",
+      "メトリクス送信元（EKS の collector 等）の構成",
+      "保持期間の設定（既定150日・最大1095日）"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "メトリクスの取り込み量・保存量"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "eks",
+      "cloudwatch",
+      "grafana"
+    ],
+    "alternatives": [
+      "cloudwatch"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/prometheus/latest/userguide/what-is-Amazon-Managed-Service-Prometheus.html",
+      "pricing": "https://aws.amazon.com/prometheus/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
