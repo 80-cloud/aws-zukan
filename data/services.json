@@ -906,5 +906,518 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "kms",
+    "name": "AWS KMS",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "暗号鍵の作成・管理・利用を行うマネージドサービス。各種 AWS の保管時暗号化の鍵を一元管理する。",
+    "mainUseCases": [
+      "保管時暗号化(S3／EBS／RDS 等)の鍵管理",
+      "アプリ内データの暗号化／復号",
+      "鍵のアクセス制御と監査"
+    ],
+    "notSuitableFor": [
+      "大量データ本体の暗号化処理（データは各サービス側で暗号化し鍵だけ KMS）",
+      "鍵を AWS 外へ持ち出す用途"
+    ],
+    "companions": [
+      {
+        "serviceId": "iam",
+        "role": "鍵ポリシー／権限"
+      },
+      {
+        "serviceId": "cloudtrail",
+        "role": "鍵使用の監査"
+      },
+      {
+        "serviceId": "s3",
+        "role": "暗号化対象"
+      }
+    ],
+    "related": [
+      "iam",
+      "s3",
+      "ebs"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "encryption",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "鍵ポリシーで最小権限",
+      "キーローテーションを有効化",
+      "CloudTrail で鍵使用を記録"
+    ],
+    "costGotcha": "鍵ごとの月額＋API リクエストで課金。未使用のカスタマーマネージドキーが残ると無駄になる。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "鍵数",
+        "API リクエスト数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "鍵は削除前に待機期間（保護）あり。",
+      "changeImpact": "鍵ポリシー変更は即時反映。",
+      "failover": "マネージドでリージョン内冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/kms/",
+      "pricing": "https://aws.amazon.com/kms/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "cloudtrail",
+    "name": "AWS CloudTrail",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "アカウントの API 操作・ユーザー活動を記録する監査ログサービス。ガバナンス／コンプライアンスの土台。",
+    "mainUseCases": [
+      "操作監査・コンプライアンス（誰が何をしたか）",
+      "セキュリティ調査",
+      "変更の追跡"
+    ],
+    "notSuitableFor": [
+      "アプリのメトリクス監視（→ CloudWatch）",
+      "リアルタイムの性能監視"
+    ],
+    "companions": [
+      {
+        "serviceId": "s3",
+        "role": "ログ保管先"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "ログ連携／アラート"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "cloudwatch",
+      "iam",
+      "s3"
+    ],
+    "alternatives": [
+      "cloudwatch"
+    ],
+    "commonRuleRefs": [
+      "logging",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "全リージョンの証跡を有効化",
+      "ログ用 S3 の保護（暗号化／改ざん防止）",
+      "ログ保持期間の設計"
+    ],
+    "costGotcha": "管理イベントは無料枠あり。データイベント記録を広げると S3 保管／取得で課金が伸びる。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "データイベント数",
+        "S3 保管"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "ログは S3 に保管（ライフサイクル）。",
+      "changeImpact": "証跡設定の変更は記録範囲に影響。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/cloudtrail/",
+      "pricing": "https://aws.amazon.com/cloudtrail/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "cloudformation",
+    "name": "AWS CloudFormation",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "AWS リソースをテンプレート（コード）で定義・構築する IaC サービス。AWS 純正のスタック管理。",
+    "mainUseCases": [
+      "インフラのコード化・再現",
+      "スタック単位の作成／更新／削除",
+      "CI/CD でのプロビジョニング"
+    ],
+    "notSuitableFor": [
+      "マルチクラウド／AWS 外リソースの管理（→ Terraform 等）",
+      "手作業の場当たり変更"
+    ],
+    "companions": [
+      {
+        "serviceId": "iam",
+        "role": "実行権限"
+      },
+      {
+        "serviceId": "s3",
+        "role": "テンプレート保管"
+      }
+    ],
+    "related": [
+      "s3",
+      "iam"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iac-state",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "変更セット(change set)で差分確認",
+      "スタックポリシー／削除保護",
+      "最小権限の実行ロール"
+    ],
+    "costGotcha": "CloudFormation 自体は基本無料。作成されるリソース側の課金に注意（サードパーティ拡張は別途課金）。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "サードパーティ拡張の操作数のみ"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "テンプレートはバージョン管理。",
+      "changeImpact": "更新は change set で影響を確認。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/cloudformation/",
+      "pricing": "https://aws.amazon.com/cloudformation/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "sns",
+    "name": "Amazon SNS",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "1 対多の通知を配信する Pub/Sub メッセージング。イベントの fan-out や SMS／メール通知に使う。",
+    "mainUseCases": [
+      "イベントの fan-out（複数購読者へ配信）",
+      "システム間通知",
+      "SMS／メール／プッシュ通知"
+    ],
+    "notSuitableFor": [
+      "1 対 1 で確実に 1 回処理させたいキュー用途（→ SQS）",
+      "メッセージの長期保持"
+    ],
+    "companions": [
+      {
+        "serviceId": "sqs",
+        "role": "fan-out 先のキュー"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "購読／処理"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "sqs",
+      "lambda"
+    ],
+    "alternatives": [
+      "sqs"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "トピックのアクセスポリシー",
+      "配信失敗時の DLQ(SQS) 設定",
+      "暗号化(KMS)の検討"
+    ],
+    "costGotcha": "配信数で課金。SMS は宛先国により単価が高い。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "リクエスト数",
+        "配信数",
+        "SMS"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "購読／ポリシー変更は即時。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/sns/",
+      "pricing": "https://aws.amazon.com/sns/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "sqs",
+    "name": "Amazon SQS",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "コンポーネント間を疎結合にするマネージドなメッセージキュー。処理の非同期化・バッファに使う。",
+    "mainUseCases": [
+      "マイクロサービスの疎結合",
+      "処理の非同期化／バッファリング",
+      "負荷の平準化（ワーカーでスケール）"
+    ],
+    "notSuitableFor": [
+      "1 対多の同時配信（→ SNS）",
+      "全件で厳密な順序かつ超高スループット（FIFO は上限あり）"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "コンシューマ"
+      },
+      {
+        "serviceId": "sns",
+        "role": "fan-out 元"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "sns",
+      "lambda"
+    ],
+    "alternatives": [
+      "sns"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "DLQ（処理失敗の退避）",
+      "可視性タイムアウトの設計",
+      "暗号化(KMS)の検討"
+    ],
+    "costGotcha": "リクエスト数で課金。空ポーリングを減らすためロングポーリングを使う。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "リクエスト数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "属性変更は即時。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/sqs/",
+      "pricing": "https://aws.amazon.com/sqs/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "eks",
+    "name": "Amazon EKS",
+    "category": "compute",
+    "tier": 1,
+    "oneLiner": "マネージドな Kubernetes。K8s 標準のツール／エコシステムをそのまま AWS 上で使える。",
+    "mainUseCases": [
+      "Kubernetes 標準で動かしたい本番運用",
+      "複数環境（クラウド／オンプレ／エッジ）で揃える",
+      "大規模コンテナ基盤"
+    ],
+    "notSuitableFor": [
+      "AWS 中心でシンプルに済ませたい（→ ECS）",
+      "単発のイベント処理（→ Lambda）",
+      "小規模で運用負荷を避けたい"
+    ],
+    "companions": [
+      {
+        "serviceId": "ec2",
+        "role": "ノード"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "イメージ"
+      },
+      {
+        "serviceId": "alb",
+        "role": "Ingress／ロードバランサ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "IRSA／権限"
+      }
+    ],
+    "related": [
+      "ecs",
+      "ec2",
+      "ecr"
+    ],
+    "alternatives": [
+      "ecs"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "productionPrereqs": [
+      "コントロールプレーン／ノードのバージョン管理",
+      "IAM と K8s RBAC の対応設計",
+      "ネットワーク（VPC CNI）設計"
+    ],
+    "costGotcha": "コントロールプレーンの時間課金＋ノード(EC2／Fargate)費用。クラスタ常設で固定費が出る。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "コントロールプレーン時間",
+        "ノード(EC2／Fargate)"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "マニフェストは IaC／GitOps 管理。",
+      "changeImpact": "バージョンアップは計画的に。",
+      "failover": "複数 AZ にノード分散。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/eks/",
+      "pricing": "https://aws.amazon.com/eks/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
