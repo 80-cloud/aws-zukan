@@ -16,16 +16,24 @@ export default function ScenarioSearch() {
         className="mb-5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
       />
       {filtered.length === 0 ? <p className="text-gray-400">該当なし。</p> : (
-        <ul className="space-y-5">
+        <ul className="space-y-6">
           {filtered.map(g => (
             <li key={g.tag}>
               <h2 className="text-sm font-semibold text-gray-700">{g.tag} <span className="text-gray-400">（{g.patterns.length}）</span></h2>
+              {g.note && <p className="mt-1 text-sm text-gray-500">{g.note}</p>}
               <ul className="mt-2 space-y-2">
                 {g.patterns.map(p => (
                   <li key={p.id}>
                     <Link to={`/pattern/${p.id}`} className="block rounded-lg border border-gray-200 p-3 hover:border-gray-400 hover:bg-gray-50">
                       <span className="font-medium">{p.name}</span>
                       <p className="mt-1 text-sm text-gray-600">{p.goal}</p>
+                      {p.stack.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {p.stack.map(s => (
+                            <span key={s.id} className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">{s.name}</span>
+                          ))}
+                        </div>
+                      )}
                     </Link>
                   </li>
                 ))}

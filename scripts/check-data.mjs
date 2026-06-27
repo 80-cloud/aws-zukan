@@ -4,6 +4,7 @@ const load = (p) => JSON.parse(readFileSync(p, 'utf8'))
 const services = load('data/services.json')
 const patterns = load('data/patterns.json')
 const rules = load('data/common-rules.json')
+const scenarioNotes = load('data/scenario-notes.json')
 
 const serviceIds = new Set(services.map(s => s.id))
 const ruleKeys = new Set(rules.map(r => r.key))
@@ -61,6 +62,13 @@ for (const p of patterns) {
 }
 
 for (const r of rules) if (!r.key || !r.title || !r.body) errors.push('rule ' + r.key + ': 必須項目が欠落')
+
+// scenario-notes のキーは実在の scenarioTag のみ（孤立した解説を防ぐ）
+const allTags = new Set(patterns.flatMap(p => p.scenarioTags || []))
+for (const tag of Object.keys(scenarioNotes)) {
+  if (!allTags.has(tag)) errors.push('scenario-note "' + tag + '": どのパターンも持たないタグ')
+  scanAssertive(scenarioNotes[tag], 'scenario-note ' + tag)
+}
 
 console.log('services=' + services.length + ' patterns=' + patterns.length + ' rules=' + rules.length)
 if (errors.length) {

@@ -1,0 +1,14 @@
+{
+  "外部公開アプリ": "公開の入口（ALB / API Gateway / CloudFront / AppSync）と実行基盤（EC2 / コンテナ / Lambda）の組み合わせで選ぶ。状態の持ち方（RDS / DynamoDB / Aurora）と認証の要否で構成が分かれる。",
+  "オンプレ移行": "既存資産をそのまま運ぶ（EC2 / RDS）か、拠点間の接続を張る（Direct Connect / Transit Gateway）かで方針が分かれる。段階移行か全面刷新かを前提に選ぶ。",
+  "チーム開発基盤": "状態共有（Terraform state）・自動化（CI/CD）・鍵レス運用（Session Manager + OIDC）など、複数人で壊さずに回すための土台。",
+  "外部公開サイト": "静的配信は S3 + CloudFront が基本。動的 API も同居させたい場合は CloudFront 1 枚に SPA + API を寄せる選択肢がある。",
+  "DB の隔離": "DB は公開サブネットに置かず、踏み台や専用層（EC2 経由 / サーバーレス）からのみ届くようにする。接続元の形で構成が変わる。",
+  "勉強用デプロイ": "最小コストで動かすのが前提。常時起動の EC2 か、使った分だけのサーバーレスかで、コストと手間が変わる。",
+  "スタートアップ MVP": "初速重視でサーバー管理を持たないサーバーレスが起点。データの形（KV は DynamoDB / 関係は Aurora）で分かれる。",
+  "データ分析": "蓄積して後で分析（S3 + Glue + Athena）か、流れてくるデータを即処理（Kinesis）かで構成が分かれる。",
+  "マルチアカウント統制": "複数アカウントを横断で統制する土台。ガバナンス（Organizations / Config）とネットワーク接続（Transit Gateway）の両面がある。",
+  "監査／コンプライアンス": "証跡（CloudTrail / Config）と、鍵を持たない運用（Session Manager + OIDC）で「誰が何をしたか」を残す。",
+  "CI/CD 導入": "ビルドからデプロイまでの自動化。パイプライン（Code 兄弟）と、デプロイ経路の鍵レス化（OIDC）を組み合わせる。",
+  "モバイル／SPA": "フロント（SPA / モバイル）に対し、GraphQL（AppSync）か、CloudFront 配信 + API 同居かで API の出し方が分かれる。"
+}
