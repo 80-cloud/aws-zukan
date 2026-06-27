@@ -8,6 +8,7 @@ import Compare from './components/Compare'
 import SecurityCatalog from './components/SecurityCatalog'
 import CostDictionary from './components/CostDictionary'
 import ScenarioSearch from './components/ScenarioSearch'
+import About from './components/About'
 export default function App() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -22,6 +23,7 @@ export default function App() {
             <Link to="/cost" className="hover:text-gray-900">コスト</Link>
             <Link to="/rules" className="hover:text-gray-900">共通ルール</Link>
             <Link to="/compare" className="hover:text-gray-900">比較</Link>
+            <Link to="/about" className="hover:text-gray-900">設計思想</Link>
           </nav>
         </div>
       </header>
@@ -36,6 +38,7 @@ export default function App() {
           <Route path="/cost" element={<CostDictionary />} />
           <Route path="/rules" element={<CommonRules />} />
           <Route path="/compare" element={<Compare />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </main>
     </div>
