@@ -25,7 +25,8 @@
       "monitoring",
       "cost",
       "tagging",
-      "iam-templates"
+      "iam-templates",
+      "tls-strategy"
     ],
     "cost": {
       "freeTier": true,
@@ -447,7 +448,8 @@
       "network",
       "monitoring",
       "cost",
-      "tagging"
+      "tagging",
+      "tls-strategy"
     ],
     "cost": {
       "freeTier": false,
@@ -801,7 +803,8 @@
     ],
     "commonRuleRefs": [
       "logging",
-      "encryption"
+      "encryption",
+      "tls-strategy"
     ],
     "cost": {
       "freeTier": true,
@@ -902,7 +905,8 @@
       "レコードの IaC 管理"
     ],
     "commonRuleRefs": [
-      "logging"
+      "logging",
+      "tls-strategy"
     ],
     "cost": {
       "freeTier": false,
@@ -978,7 +982,8 @@
       "CloudFront 用は us-east-1 で発行"
     ],
     "commonRuleRefs": [
-      "encryption"
+      "encryption",
+      "tls-strategy"
     ],
     "cost": {
       "freeTier": true,
@@ -1458,7 +1463,8 @@
     ],
     "commonRuleRefs": [
       "network",
-      "tagging"
+      "tagging",
+      "tls-strategy"
     ],
     "productionPrereqs": [
       "複数 AZ にターゲットを配置",
@@ -2152,7 +2158,8 @@
     ],
     "commonRuleRefs": [
       "iam",
-      "logging"
+      "logging",
+      "tls-strategy"
     ],
     "productionPrereqs": [
       "認証・認可（IAM／オーソライザ）",
