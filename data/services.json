@@ -4,40 +4,110 @@
     "name": "Amazon EC2",
     "category": "compute",
     "oneLiner": "用途を選ばない仮想サーバー。OS から自分で管理する。",
-    "mainUseCases": ["既存アプリの移行", "常時稼働するアプリ", "特殊なミドルウェア利用"],
-    "notSuitableFor": ["短時間だけの処理", "運用者がいない小規模処理"],
-    "productionPrereqs": ["IAM ロール", "監視・ログ", "バックアップ", "パッチ運用"],
-    "commonRuleRefs": ["network", "iam"],
-    "cost": { "freeTier": true, "meteredAxes": ["稼働時間", "EBS", "転送量"], "relative": "中" },
-    "related": ["ebs", "alb", "ecr", "iam"],
-    "alternatives": ["ecs", "lambda"],
-    "difficulty": { "tech": 2, "ops": 3, "org": 2 },
-    "links": { "overview": "https://aws.amazon.com/ec2/", "pricing": "https://aws.amazon.com/ec2/pricing/" },
+    "mainUseCases": [
+      "既存アプリの移行",
+      "常時稼働するアプリ",
+      "特殊なミドルウェア利用"
+    ],
+    "notSuitableFor": [
+      "短時間だけの処理",
+      "運用者がいない小規模処理"
+    ],
+    "productionPrereqs": [
+      "IAM ロール",
+      "監視・ログ",
+      "バックアップ",
+      "パッチ運用"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "iam",
+      "monitoring",
+      "cost",
+      "tagging",
+      "iam-templates"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "稼働時間",
+        "EBS",
+        "転送量"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "ebs",
+      "alb",
+      "ecr",
+      "iam"
+    ],
+    "alternatives": [
+      "ecs",
+      "lambda"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 3,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/ec2/",
+      "pricing": "https://aws.amazon.com/ec2/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "companions": [
-      { "serviceId": "cloudwatch", "role": "監視・ログ" },
-      { "serviceId": "iam", "role": "権限（ロール付与）" },
-      { "serviceId": "ebs", "role": "ディスク" },
-      { "serviceId": "securitygroup", "role": "通信制御" }
+      {
+        "serviceId": "cloudwatch",
+        "role": "監視・ログ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限（ロール付与）"
+      },
+      {
+        "serviceId": "ebs",
+        "role": "ディスク"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "通信制御"
+      }
     ],
     "costGotcha": "停止してもアタッチ済み EBS は課金が続く。常時起動・過剰スペックも見落としやすい。",
     "adoption": {
-      "region": { "tokyo": true },
+      "region": {
+        "tokyo": true
+      },
       "sla": "EC2 に SLA あり。単一 AZ では AZ 障害で停止しうるため、可用性要件が高ければ複数 AZ + ロードバランサ + Auto Scaling を検討。",
       "lockin": "低",
-      "modernizeTo": ["ecs", "lambda"]
+      "modernizeTo": [
+        "ecs",
+        "lambda"
+      ]
     },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "AMI・EBS スナップショットでバックアップ。AWS Backup に対応。",
       "changeImpact": "インスタンスタイプ変更は停止が要る。一部の属性は再作成になる。",
       "failover": "複数 AZ 配置 + ロードバランサ + Auto Scaling で AZ 障害に備える。"
     },
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "EC2 上でビルドするとメモリ不足になりやすい。手元でイメージを焼いて ECR に push し、EC2 は pull して動かすだけにすると軽い。" },
-      { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "手元が Apple Silicon(arm64) だと、何もしないと arm64 イメージができ EC2(x86_64) で exec format error。ビルド時に --platform linux/amd64 を付ける。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
+        "gotcha": "EC2 上でビルドするとメモリ不足になりやすい。手元でイメージを焼いて ECR に push し、EC2 は pull して動かすだけにすると軽い。"
+      },
+      {
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
+        "gotcha": "手元が Apple Silicon(arm64) だと、何もしないと arm64 イメージができ EC2(x86_64) で exec format error。ビルド時に --platform linux/amd64 を付ける。"
+      }
     ]
   },
   {
@@ -45,21 +115,54 @@
     "name": "Amazon EBS",
     "category": "storage",
     "oneLiner": "EC2 につなぐブロックストレージ（仮想ディスク）。",
-    "mainUseCases": ["EC2 の OS・データ領域", "スナップショットでのバックアップ"],
-    "notSuitableFor": ["複数サーバーからの同時共有（基本は単一アタッチ）"],
-    "productionPrereqs": ["スナップショット運用", "残存ボリュームの棚卸し"],
-    "commonRuleRefs": [],
-    "cost": { "freeTier": true, "meteredAxes": ["容量", "IOPS"], "relative": "低" },
-    "related": ["ec2"],
-    "alternatives": ["s3", "efs"],
-    "difficulty": { "tech": 2, "ops": 2, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/ebs/", "pricing": "https://aws.amazon.com/ebs/pricing/" },
+    "mainUseCases": [
+      "EC2 の OS・データ領域",
+      "スナップショットでのバックアップ"
+    ],
+    "notSuitableFor": [
+      "複数サーバーからの同時共有（基本は単一アタッチ）"
+    ],
+    "productionPrereqs": [
+      "スナップショット運用",
+      "残存ボリュームの棚卸し"
+    ],
+    "commonRuleRefs": [
+      "backup",
+      "tagging"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "容量",
+        "IOPS"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ec2"
+    ],
+    "alternatives": [
+      "s3",
+      "efs"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/ebs/",
+      "pricing": "https://aws.amazon.com/ebs/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "costGotcha": "EC2 を消してもデタッチされた EBS ボリュームは残って課金され続ける（残存課金）。棚卸しが必要。",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/ec080e21d666ef7cae2b", "gotcha": "EBS ボリュームを拡張しても、OS 側で growpart とファイルシステム拡張(xfs_growfs 等)をしないと空き容量は増えない。「ディスクを増やした＝使える」ではない。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/ec080e21d666ef7cae2b",
+        "gotcha": "EBS ボリュームを拡張しても、OS 側で growpart とファイルシステム拡張(xfs_growfs 等)をしないと空き容量は増えない。「ディスクを増やした＝使える」ではない。"
+      }
     ]
   },
   {
@@ -67,33 +170,81 @@
     "name": "Amazon S3",
     "category": "storage",
     "oneLiner": "容量無制限のオブジェクトストレージ。静的配信や保管に。",
-    "mainUseCases": ["静的サイト配信", "画像・バックアップ保管", "Terraform state 置き場"],
-    "notSuitableFor": ["低レイテンシのランダム更新", "リレーショナルな検索"],
-    "productionPrereqs": ["バージョニング", "暗号化", "パブリックアクセス遮断"],
-    "commonRuleRefs": ["encryption", "iac-state"],
-    "cost": { "freeTier": true, "meteredAxes": ["容量", "リクエスト数", "転送量"], "relative": "低" },
-    "related": ["cloudfront", "dynamodb"],
-    "alternatives": ["ebs", "efs"],
-    "difficulty": { "tech": 1, "ops": 1, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/s3/", "pricing": "https://aws.amazon.com/s3/pricing/" },
+    "mainUseCases": [
+      "静的サイト配信",
+      "画像・バックアップ保管",
+      "Terraform state 置き場"
+    ],
+    "notSuitableFor": [
+      "低レイテンシのランダム更新",
+      "リレーショナルな検索"
+    ],
+    "productionPrereqs": [
+      "バージョニング",
+      "暗号化",
+      "パブリックアクセス遮断"
+    ],
+    "commonRuleRefs": [
+      "encryption",
+      "iac-state",
+      "backup",
+      "tagging",
+      "iam-templates"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "容量",
+        "リクエスト数",
+        "転送量"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "cloudfront",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "ebs",
+      "efs"
+    ],
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/s3/",
+      "pricing": "https://aws.amazon.com/s3/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "adoption": {
-      "region": { "tokyo": true },
+      "region": {
+        "tokyo": true
+      },
       "sla": "標準ストレージは高い可用性・耐久性の SLA を持つ。",
       "lockin": "中",
       "modernizeTo": []
     },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "バージョニングで誤削除に対応。クロスリージョンレプリケーションで別リージョンへ複製可。",
       "changeImpact": "バケット名は後から変更不可（作り直しになる）。",
       "failover": "標準で複数 AZ に冗長化。リージョン障害にはクロスリージョンレプリケーション。",
       "dataResidency": "保管リージョンを意識する。クロスリージョン複製時は越境(個人情報等)の扱いに注意。"
     },
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4", "gotcha": "Terraform の state 置き場に使うときは、バージョニング・暗号化・パブリックアクセス遮断をセットで有効にする（state には機密が平文で入りうる）。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4",
+        "gotcha": "Terraform の state 置き場に使うときは、バージョニング・暗号化・パブリックアクセス遮断をセットで有効にする（state には機密が平文で入りうる）。"
+      }
     ]
   },
   {
@@ -101,34 +252,87 @@
     "name": "Amazon RDS",
     "category": "database",
     "oneLiner": "マネージドなリレーショナルDB（PostgreSQL/MySQL 等）。",
-    "mainUseCases": ["アプリの主データベース", "バックアップ・パッチを任せたい場合"],
-    "notSuitableFor": ["キー値中心の超高スループット", "DB 管理を完全に握りたい場合"],
-    "productionPrereqs": ["private サブネット配置", "セキュリティグループ設計", "自動バックアップ"],
-    "commonRuleRefs": ["network"],
-    "cost": { "freeTier": true, "meteredAxes": ["インスタンス時間", "ストレージ"], "relative": "中" },
-    "related": ["ec2", "vpc"],
-    "alternatives": ["dynamodb", "aurora"],
-    "difficulty": { "tech": 2, "ops": 2, "org": 2 },
-    "links": { "overview": "https://aws.amazon.com/rds/", "pricing": "https://aws.amazon.com/rds/pricing/" },
+    "mainUseCases": [
+      "アプリの主データベース",
+      "バックアップ・パッチを任せたい場合"
+    ],
+    "notSuitableFor": [
+      "キー値中心の超高スループット",
+      "DB 管理を完全に握りたい場合"
+    ],
+    "productionPrereqs": [
+      "private サブネット配置",
+      "セキュリティグループ設計",
+      "自動バックアップ"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "backup",
+      "monitoring",
+      "cost",
+      "tagging",
+      "iam-templates"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "インスタンス時間",
+        "ストレージ"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "ec2",
+      "vpc"
+    ],
+    "alternatives": [
+      "dynamodb",
+      "aurora"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/rds/",
+      "pricing": "https://aws.amazon.com/rds/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "adoption": {
-      "region": { "tokyo": true },
+      "region": {
+        "tokyo": true
+      },
       "quotaGotcha": "無料利用枠は同時に使える DB インスタンス数などに上限があり、超えると作成自体が失敗する。",
       "sla": "Multi-AZ 構成で SLA 対象。単一 AZ は AZ 障害の影響を受ける。",
       "lockin": "中",
-      "modernizeTo": ["aurora", "dynamodb"]
+      "modernizeTo": [
+        "aurora",
+        "dynamodb"
+      ]
     },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "自動バックアップ＋手動スナップショット。ポイントインタイムリカバリ(PITR)対応。スナップショットは別アカウント/リージョンへコピー可。",
       "changeImpact": "インスタンスクラス変更やメジャーバージョンアップはダウンタイム/再起動を伴う。Multi-AZ で影響を抑えられる。",
       "failover": "Multi-AZ で自動フェイルオーバー。リードレプリカで読み取りを分散。"
     },
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06", "gotcha": "「パブリックアクセスなし」の RDS は VPC 外(手元の Mac 等)から直接は届かずタイムアウトする。これは障害ではなく隔離が効いているサイン。VPC 内の EC2 を経由して接続する。" },
-      { "source": "https://qiita.com/80-cloud/items/d3d33949fafade4712eb", "gotcha": "無料利用枠の上限(同時に使える DB インスタンス数など)に当たると作成自体が失敗する。Terraform でも原因はコードでなく枠だったことがある。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06",
+        "gotcha": "「パブリックアクセスなし」の RDS は VPC 外(手元の Mac 等)から直接は届かずタイムアウトする。これは障害ではなく隔離が効いているサイン。VPC 内の EC2 を経由して接続する。"
+      },
+      {
+        "source": "https://qiita.com/80-cloud/items/d3d33949fafade4712eb",
+        "gotcha": "無料利用枠の上限(同時に使える DB インスタンス数など)に当たると作成自体が失敗する。Terraform でも原因はコードでなく枠だったことがある。"
+      }
     ]
   },
   {
@@ -136,20 +340,56 @@
     "name": "Amazon DynamoDB",
     "category": "database",
     "oneLiner": "フルマネージドな NoSQL（キー値・ドキュメント）。",
-    "mainUseCases": ["キー値アクセス", "高スループットな読み書き", "Terraform state ロック(従来構成)"],
-    "notSuitableFor": ["複雑な結合・集計", "全文検索"],
-    "productionPrereqs": ["キー設計", "キャパシティ/オンデマンドの選択"],
-    "commonRuleRefs": ["iac-state"],
-    "cost": { "freeTier": true, "meteredAxes": ["読み書きユニット", "容量"], "relative": "低" },
-    "related": ["s3"],
-    "alternatives": ["rds"],
-    "difficulty": { "tech": 2, "ops": 1, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/dynamodb/", "pricing": "https://aws.amazon.com/dynamodb/pricing/" },
+    "mainUseCases": [
+      "キー値アクセス",
+      "高スループットな読み書き",
+      "Terraform state ロック(従来構成)"
+    ],
+    "notSuitableFor": [
+      "複雑な結合・集計",
+      "全文検索"
+    ],
+    "productionPrereqs": [
+      "キー設計",
+      "キャパシティ/オンデマンドの選択"
+    ],
+    "commonRuleRefs": [
+      "iac-state",
+      "backup",
+      "tagging",
+      "iam-templates"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "読み書きユニット",
+        "容量"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "s3"
+    ],
+    "alternatives": [
+      "rds"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/dynamodb/",
+      "pricing": "https://aws.amazon.com/dynamodb/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4", "gotcha": "Terraform の state ロックに使う構成は従来一般的だったが、バージョンによっては S3 ネイティブのロック(use_lockfile)が使え、DynamoDB ロックは非推奨になりつつある。新規は公式の現行推奨を確認する。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4",
+        "gotcha": "Terraform の state ロックに使う構成は従来一般的だったが、バージョンによっては S3 ネイティブのロック(use_lockfile)が使え、DynamoDB ロックは非推奨になりつつある。新規は公式の現行推奨を確認する。"
+      }
     ]
   },
   {
@@ -157,34 +397,84 @@
     "name": "Application Load Balancer (ALB)",
     "category": "networking",
     "oneLiner": "HTTP/HTTPS 用のロードバランサー。EC2 等の前段に置く。",
-    "mainUseCases": ["EC2/コンテナアプリの公開", "HTTPS 終端", "複数 AZ への分散"],
-    "notSuitableFor": ["極端な低レイテンシTCP（NLB 向き）", "単一サーバーで足りる小規模"],
-    "productionPrereqs": ["最低 2 つの AZ", "各 AZ に public サブネット", "ターゲットグループ"],
-    "commonRuleRefs": ["network"],
-    "cost": { "freeTier": false, "meteredAxes": ["稼働時間", "処理量(LCU)"], "relative": "中" },
-    "related": ["ec2", "vpc", "securitygroup"],
-    "alternatives": ["nlb", "cloudfront"],
-    "difficulty": { "tech": 3, "ops": 2, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/elasticloadbalancing/", "pricing": "https://aws.amazon.com/elasticloadbalancing/pricing/" },
+    "mainUseCases": [
+      "EC2/コンテナアプリの公開",
+      "HTTPS 終端",
+      "複数 AZ への分散"
+    ],
+    "notSuitableFor": [
+      "極端な低レイテンシTCP（NLB 向き）",
+      "単一サーバーで足りる小規模"
+    ],
+    "productionPrereqs": [
+      "最低 2 つの AZ",
+      "各 AZ に public サブネット",
+      "ターゲットグループ"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "monitoring",
+      "cost",
+      "tagging"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "稼働時間",
+        "処理量(LCU)"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "ec2",
+      "vpc",
+      "securitygroup"
+    ],
+    "alternatives": [
+      "nlb",
+      "cloudfront"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/elasticloadbalancing/",
+      "pricing": "https://aws.amazon.com/elasticloadbalancing/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "costGotcha": "無料枠なし。立てている間ずっと課金され、処理量(LCU)でも増える。検証で立てたまま放置しない。",
     "adoption": {
-      "region": { "tokyo": true },
+      "region": {
+        "tokyo": true
+      },
       "sla": "ELB に SLA あり。複数 AZ 構成が前提。",
       "lockin": "中",
       "modernizeTo": []
     },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "状態を持たないため個別バックアップは不要。設定は IaC で管理する。",
       "changeImpact": "サブネット/AZ の変更は影響が大きい。リスナー/ターゲットの変更は比較的安全。",
       "failover": "複数 AZ に分散し、単一 AZ 障害に耐える。"
     },
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5", "gotcha": "インターネット向け ALB は 2 つの AZ それぞれに public サブネットが必要。「サブネットがある」と「2 AZ に public サブネットがある」は別物で、1 AZ にしか public が無いと作成画面で止まる。" },
-      { "source": "https://qiita.com/80-cloud/items/893794cdcdfa0e7ef258", "gotcha": "ターゲットグループを作っても、VPC やターゲット種別が噛み合っていないとリスナーの転送先候補に出てこないことがある。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5",
+        "gotcha": "インターネット向け ALB は 2 つの AZ それぞれに public サブネットが必要。「サブネットがある」と「2 AZ に public サブネットがある」は別物で、1 AZ にしか public が無いと作成画面で止まる。"
+      },
+      {
+        "source": "https://qiita.com/80-cloud/items/893794cdcdfa0e7ef258",
+        "gotcha": "ターゲットグループを作っても、VPC やターゲット種別が噛み合っていないとリスナーの転送先候補に出てこないことがある。"
+      }
     ]
   },
   {
@@ -192,20 +482,52 @@
     "name": "Amazon VPC",
     "category": "networking",
     "oneLiner": "AWS 上に作る自分の仮想ネットワーク。サブネット・経路を持つ。",
-    "mainUseCases": ["サーバー・DB の隔離配置", "public/private の分離"],
-    "notSuitableFor": ["ネットワーク不要の単純な静的配信のみ"],
-    "productionPrereqs": ["public/private サブネット設計", "ルートテーブル", "IGW/NAT"],
-    "commonRuleRefs": ["network"],
-    "cost": { "freeTier": true, "meteredAxes": ["NAT 等の付随リソース"], "relative": "低" },
-    "related": ["ec2", "rds", "alb"],
+    "mainUseCases": [
+      "サーバー・DB の隔離配置",
+      "public/private の分離"
+    ],
+    "notSuitableFor": [
+      "ネットワーク不要の単純な静的配信のみ"
+    ],
+    "productionPrereqs": [
+      "public/private サブネット設計",
+      "ルートテーブル",
+      "IGW/NAT"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "tagging"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "NAT 等の付随リソース"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ec2",
+      "rds",
+      "alb"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 3, "ops": 2, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/vpc/", "pricing": "https://aws.amazon.com/vpc/pricing/" },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/vpc/",
+      "pricing": "https://aws.amazon.com/vpc/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5", "gotcha": "サブネットは作っただけでは public にならない。0.0.0.0/0 → IGW の経路を持つルートテーブルに関連付けて初めて「外に出られる public サブネット」になる。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5",
+        "gotcha": "サブネットは作っただけでは public にならない。0.0.0.0/0 → IGW の経路を持つルートテーブルに関連付けて初めて「外に出られる public サブネット」になる。"
+      }
     ]
   },
   {
@@ -213,21 +535,54 @@
     "name": "Security Group",
     "category": "security",
     "oneLiner": "リソース単位の仮想ファイアウォール（許可ルールの集合）。",
-    "mainUseCases": ["EC2/RDS/ALB の通信許可制御", "リソース間の到達制御"],
-    "notSuitableFor": ["サブネット全体の遮断（NACL の領域）"],
-    "productionPrereqs": ["最小許可", "許可元は IP より SG を優先"],
-    "commonRuleRefs": ["network"],
-    "cost": { "freeTier": true, "meteredAxes": [], "relative": "低" },
-    "related": ["ec2", "rds", "alb", "vpc"],
-    "alternatives": ["nacl"],
-    "difficulty": { "tech": 2, "ops": 2, "org": 1 },
-    "links": { "overview": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html" },
+    "mainUseCases": [
+      "EC2/RDS/ALB の通信許可制御",
+      "リソース間の到達制御"
+    ],
+    "notSuitableFor": [
+      "サブネット全体の遮断（NACL の領域）"
+    ],
+    "productionPrereqs": [
+      "最小許可",
+      "許可元は IP より SG を優先"
+    ],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [],
+      "relative": "低"
+    },
+    "related": [
+      "ec2",
+      "rds",
+      "alb",
+      "vpc"
+    ],
+    "alternatives": [
+      "nacl"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/f8f04de4a9206f8ffa95", "gotcha": "SSH(22) を 0.0.0.0/0 で開けると総当たりの標的になる。必要なら自分の IP に絞る／Session Manager を使う／ALB 経由で SSH 不要なら開けない。" },
-      { "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06", "gotcha": "許可元は IP だけでなく「別のセキュリティグループ」を指定できる。RDS の許可元を EC2 の SG にすると、EC2 の IP が変わってもルールを直さずに済む。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/f8f04de4a9206f8ffa95",
+        "gotcha": "SSH(22) を 0.0.0.0/0 で開けると総当たりの標的になる。必要なら自分の IP に絞る／Session Manager を使う／ALB 経由で SSH 不要なら開けない。"
+      },
+      {
+        "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06",
+        "gotcha": "許可元は IP だけでなく「別のセキュリティグループ」を指定できる。RDS の許可元を EC2 の SG にすると、EC2 の IP が変わってもルールを直さずに済む。"
+      }
     ]
   },
   {
@@ -235,20 +590,47 @@
     "name": "AWS IAM",
     "category": "security",
     "oneLiner": "誰が何をできるかを決める権限管理。ロール・ポリシー。",
-    "mainUseCases": ["EC2 等へのロール付与", "最小権限の設計", "一時資格の発行"],
-    "notSuitableFor": ["アプリ内のユーザー認証そのもの（用途が別）"],
-    "productionPrereqs": ["最小権限", "長期キーを機械に置かない"],
-    "commonRuleRefs": ["iam"],
-    "cost": { "freeTier": true, "meteredAxes": [], "relative": "低" },
-    "related": ["ec2", "ecr"],
+    "mainUseCases": [
+      "EC2 等へのロール付与",
+      "最小権限の設計",
+      "一時資格の発行"
+    ],
+    "notSuitableFor": [
+      "アプリ内のユーザー認証そのもの（用途が別）"
+    ],
+    "productionPrereqs": [
+      "最小権限",
+      "長期キーを機械に置かない"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [],
+      "relative": "低"
+    },
+    "related": [
+      "ec2",
+      "ecr"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 3, "ops": 2, "org": 2 },
-    "links": { "overview": "https://aws.amazon.com/iam/" },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/iam/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "EC2 が ECR から pull する認証は、アクセスキーを user_data に直書きせず IAM ロールで配る。一時資格が自動更新され、長期の鍵を機械に置かずに済む。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
+        "gotcha": "EC2 が ECR から pull する認証は、アクセスキーを user_data に直書きせず IAM ロールで配る。一時資格が自動更新され、長期の鍵を機械に置かずに済む。"
+      }
     ]
   },
   {
@@ -256,20 +638,50 @@
     "name": "Amazon ECR",
     "category": "compute",
     "oneLiner": "コンテナイメージのプライベートな倉庫（レジストリ）。",
-    "mainUseCases": ["Docker イメージの保管", "EC2/ECS への配布元"],
-    "notSuitableFor": ["コンテナを使わない構成"],
-    "productionPrereqs": ["IAM での pull 権限", "アーキ(amd64/arm64)の整合"],
-    "commonRuleRefs": ["iam"],
-    "cost": { "freeTier": true, "meteredAxes": ["保管容量", "転送量"], "relative": "低" },
-    "related": ["ec2", "iam"],
+    "mainUseCases": [
+      "Docker イメージの保管",
+      "EC2/ECS への配布元"
+    ],
+    "notSuitableFor": [
+      "コンテナを使わない構成"
+    ],
+    "productionPrereqs": [
+      "IAM での pull 権限",
+      "アーキ(amd64/arm64)の整合"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "保管容量",
+        "転送量"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ec2",
+      "iam"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 2, "ops": 1, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/ecr/", "pricing": "https://aws.amazon.com/ecr/pricing/" },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/ecr/",
+      "pricing": "https://aws.amazon.com/ecr/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "push するイメージのアーキを EC2 に合わせる。Apple Silicon で焼いたまま push すると x86_64 の EC2 で動かない。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
+        "gotcha": "push するイメージのアーキを EC2 に合わせる。Apple Silicon で焼いたまま push すると x86_64 の EC2 で動かない。"
+      }
     ]
   },
   {
@@ -277,20 +689,51 @@
     "name": "Amazon CloudWatch",
     "category": "monitoring",
     "oneLiner": "メトリクス・ログ・アラームによる監視サービス。",
-    "mainUseCases": ["メトリクス監視", "アラーム通知", "ログ集約"],
-    "notSuitableFor": ["分散トレーシングの主役（X-Ray 等が別途）"],
-    "productionPrereqs": ["アラーム設計", "通知先(SNS 等)"],
-    "commonRuleRefs": [],
-    "cost": { "freeTier": true, "meteredAxes": ["メトリクス数", "ログ量", "アラーム数"], "relative": "低" },
-    "related": ["ec2"],
+    "mainUseCases": [
+      "メトリクス監視",
+      "アラーム通知",
+      "ログ集約"
+    ],
+    "notSuitableFor": [
+      "分散トレーシングの主役（X-Ray 等が別途）"
+    ],
+    "productionPrereqs": [
+      "アラーム設計",
+      "通知先(SNS 等)"
+    ],
+    "commonRuleRefs": [
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "メトリクス数",
+        "ログ量",
+        "アラーム数"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "ec2"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 2, "ops": 2, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/cloudwatch/", "pricing": "https://aws.amazon.com/cloudwatch/pricing/" },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/cloudwatch/",
+      "pricing": "https://aws.amazon.com/cloudwatch/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-26",
     "verifiedAt": "2026-06-26",
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/8fc94b79119fa3c8db38", "gotcha": "アラームを編集すると「通知」と「自動復旧(EC2 アクション)」のアクションが片方ずつ消えることがある。編集後はアクションが両方残っているか確認する。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/8fc94b79119fa3c8db38",
+        "gotcha": "アラームを編集すると「通知」と「自動復旧(EC2 アクション)」のアクションが片方ずつ消えることがある。編集後はアクションが両方残っているか確認する。"
+      }
     ]
   },
   {
@@ -298,27 +741,80 @@
     "name": "Amazon CloudFront",
     "category": "networking",
     "oneLiner": "世界中のエッジから低遅延でコンテンツを配信する CDN。静的・動的・動画配信に。",
-    "mainUseCases": ["静的サイト/SPA の高速配信", "API・動的コンテンツの高速化", "動画のストリーミング配信"],
-    "notSuitableFor": ["単一リージョン内部だけの通信", "毎回固有でキャッシュが効かない応答中心の処理"],
-    "productionPrereqs": ["HTTPS 用 ACM 証明書を us-east-1 で発行（CloudFront の制約）", "オリジンへの直接アクセス制限（OAC 等）", "アクセスログ"],
-    "commonRuleRefs": ["logging", "encryption"],
-    "cost": { "freeTier": true, "meteredAxes": ["転送量", "リクエスト数"], "relative": "中" },
+    "mainUseCases": [
+      "静的サイト/SPA の高速配信",
+      "API・動的コンテンツの高速化",
+      "動画のストリーミング配信"
+    ],
+    "notSuitableFor": [
+      "単一リージョン内部だけの通信",
+      "毎回固有でキャッシュが効かない応答中心の処理"
+    ],
+    "productionPrereqs": [
+      "HTTPS 用 ACM 証明書を us-east-1 で発行（CloudFront の制約）",
+      "オリジンへの直接アクセス制限（OAC 等）",
+      "アクセスログ"
+    ],
+    "commonRuleRefs": [
+      "logging",
+      "encryption"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "転送量",
+        "リクエスト数"
+      ],
+      "relative": "中"
+    },
     "costGotcha": "キャッシュヒット率が低いとオリジンへの転送が増え、転送量課金が膨らみやすい。",
     "companions": [
-      { "serviceId": "s3", "role": "配信オリジン" },
-      { "serviceId": "acm", "role": "TLS 証明書" },
-      { "serviceId": "route53", "role": "DNS" }
+      {
+        "serviceId": "s3",
+        "role": "配信オリジン"
+      },
+      {
+        "serviceId": "acm",
+        "role": "TLS 証明書"
+      },
+      {
+        "serviceId": "route53",
+        "role": "DNS"
+      }
     ],
-    "related": ["s3", "route53", "acm"],
+    "related": [
+      "s3",
+      "route53",
+      "acm"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 2, "ops": 2, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/cloudfront/", "pricing": "https://aws.amazon.com/cloudfront/pricing/" },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/cloudfront/",
+      "pricing": "https://aws.amazon.com/cloudfront/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
-    "adoption": { "region": { "tokyo": true }, "sla": "高い可用性の SLA を持つ（グローバルなエッジ網で配信）。", "lockin": "中", "modernizeTo": [] },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "高い可用性の SLA を持つ（グローバルなエッジ網で配信）。",
+      "lockin": "中",
+      "modernizeTo": []
+    },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "ディストリビューション設定は IaC でコード管理する。配信物のバックアップはオリジン側（S3 等）で行う。",
       "changeImpact": "設定変更後、エッジへの反映に時間がかかることがある。",
       "failover": "オリジングループで複数オリジンへのフェイルオーバーを構成できる。"
@@ -330,25 +826,73 @@
     "name": "Amazon Route 53",
     "category": "networking",
     "oneLiner": "DNS とトラフィックルーティングのマネージドサービス。名前解決・ヘルスチェック・ドメイン登録に。",
-    "mainUseCases": ["独自ドメインの名前解決", "ヘルスチェックとフェイルオーバールーティング", "レイテンシ/加重などのルーティングポリシー", "ドメイン登録"],
-    "notSuitableFor": ["DNS 以外の汎用的なキー値管理", "アプリ内部のサービスディスカバリ専用途"],
-    "productionPrereqs": ["ヘルスチェック", "レコードの IaC 管理"],
-    "commonRuleRefs": ["logging"],
-    "cost": { "freeTier": false, "meteredAxes": ["ホストゾーン数", "クエリ数"], "relative": "低" },
-    "companions": [
-      { "serviceId": "cloudfront", "role": "配信先" },
-      { "serviceId": "alb", "role": "ルーティング先" }
+    "mainUseCases": [
+      "独自ドメインの名前解決",
+      "ヘルスチェックとフェイルオーバールーティング",
+      "レイテンシ/加重などのルーティングポリシー",
+      "ドメイン登録"
     ],
-    "related": ["cloudfront", "alb"],
+    "notSuitableFor": [
+      "DNS 以外の汎用的なキー値管理",
+      "アプリ内部のサービスディスカバリ専用途"
+    ],
+    "productionPrereqs": [
+      "ヘルスチェック",
+      "レコードの IaC 管理"
+    ],
+    "commonRuleRefs": [
+      "logging"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ホストゾーン数",
+        "クエリ数"
+      ],
+      "relative": "低"
+    },
+    "companions": [
+      {
+        "serviceId": "cloudfront",
+        "role": "配信先"
+      },
+      {
+        "serviceId": "alb",
+        "role": "ルーティング先"
+      }
+    ],
+    "related": [
+      "cloudfront",
+      "alb"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 1, "ops": 1, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/route53/", "pricing": "https://aws.amazon.com/route53/pricing/" },
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/route53/",
+      "pricing": "https://aws.amazon.com/route53/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
-    "adoption": { "region": { "tokyo": true }, "sla": "非常に高い可用性の SLA を掲げる DNS サービス。", "lockin": "低", "modernizeTo": [] },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "非常に高い可用性の SLA を掲げる DNS サービス。",
+      "lockin": "低",
+      "modernizeTo": []
+    },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "レコードは IaC でコード管理する。",
       "changeImpact": "レコード変更は TTL に応じて伝播に時間がかかる。",
       "failover": "ヘルスチェックと組み合わせたフェイルオーバールーティングが可能。"
@@ -360,25 +904,70 @@
     "name": "AWS Certificate Manager",
     "category": "security",
     "oneLiner": "SSL/TLS 証明書の発行・管理・自動更新を行うサービス。パブリック証明書は無料。",
-    "mainUseCases": ["CloudFront/ALB/API Gateway の HTTPS 化", "証明書の自動更新", "プライベート証明書の発行（PCA）"],
-    "notSuitableFor": ["AWS 統合先以外への証明書持ち出し（パブリック証明書は秘密鍵を取り出せない）"],
-    "productionPrereqs": ["DNS 検証（自動更新のため）", "CloudFront 用は us-east-1 で発行"],
-    "commonRuleRefs": ["encryption"],
-    "cost": { "freeTier": true, "meteredAxes": ["プライベート CA(PCA) 利用時のみ"], "relative": "低" },
-    "companions": [
-      { "serviceId": "cloudfront", "role": "証明書の利用先" },
-      { "serviceId": "alb", "role": "証明書の利用先" }
+    "mainUseCases": [
+      "CloudFront/ALB/API Gateway の HTTPS 化",
+      "証明書の自動更新",
+      "プライベート証明書の発行（PCA）"
     ],
-    "related": ["cloudfront", "alb"],
+    "notSuitableFor": [
+      "AWS 統合先以外への証明書持ち出し（パブリック証明書は秘密鍵を取り出せない）"
+    ],
+    "productionPrereqs": [
+      "DNS 検証（自動更新のため）",
+      "CloudFront 用は us-east-1 で発行"
+    ],
+    "commonRuleRefs": [
+      "encryption"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "プライベート CA(PCA) 利用時のみ"
+      ],
+      "relative": "低"
+    },
+    "companions": [
+      {
+        "serviceId": "cloudfront",
+        "role": "証明書の利用先"
+      },
+      {
+        "serviceId": "alb",
+        "role": "証明書の利用先"
+      }
+    ],
+    "related": [
+      "cloudfront",
+      "alb"
+    ],
     "alternatives": [],
-    "difficulty": { "tech": 1, "ops": 1, "org": 1 },
-    "links": { "overview": "https://aws.amazon.com/certificate-manager/", "pricing": "https://aws.amazon.com/certificate-manager/pricing/" },
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/certificate-manager/",
+      "pricing": "https://aws.amazon.com/certificate-manager/pricing/"
+    },
     "tier": 1,
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
-    "adoption": { "region": { "tokyo": true }, "sla": "", "lockin": "中", "modernizeTo": [] },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
     "ops": {
-      "iacSupport": { "terraform": true, "cloudformation": true, "cdk": true, "cli": true },
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
       "backup": "証明書はマネージドで自動更新される。設定は IaC 管理。",
       "changeImpact": "証明書の差し替えは利用先（CloudFront/ALB）への再関連付けが要る。",
       "failover": ""
@@ -422,7 +1011,9 @@
     ],
     "commonRuleRefs": [
       "network",
-      "encryption"
+      "encryption",
+      "backup",
+      "tagging"
     ],
     "productionPrereqs": [
       "各 AZ にマウントターゲットを配置",
@@ -515,7 +1106,9 @@
     ],
     "commonRuleRefs": [
       "iam",
-      "network"
+      "network",
+      "tagging",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "タスク実行ロール(IAM)の最小権限",
@@ -605,7 +1198,10 @@
     ],
     "commonRuleRefs": [
       "iam",
-      "logging"
+      "logging",
+      "monitoring",
+      "tagging",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "実行ロールの最小権限",
@@ -696,7 +1292,10 @@
     ],
     "commonRuleRefs": [
       "network",
-      "encryption"
+      "encryption",
+      "backup",
+      "tagging",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "private サブネットへ配置",
@@ -783,7 +1382,8 @@
       "alb"
     ],
     "commonRuleRefs": [
-      "network"
+      "network",
+      "tagging"
     ],
     "productionPrereqs": [
       "複数 AZ にターゲットを配置",
@@ -1031,7 +1631,8 @@
     ],
     "commonRuleRefs": [
       "logging",
-      "iam"
+      "iam",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "全リージョンの証跡を有効化",
@@ -1372,7 +1973,10 @@
     ],
     "commonRuleRefs": [
       "iam",
-      "network"
+      "network",
+      "cost",
+      "tagging",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "コントロールプレーン／ノードのバージョン管理",
@@ -1907,7 +2511,9 @@
     ],
     "commonRuleRefs": [
       "network",
-      "encryption"
+      "encryption",
+      "backup",
+      "tagging"
     ],
     "productionPrereqs": [
       "private サブネットへ配置",
@@ -2415,7 +3021,8 @@
     ],
     "commonRuleRefs": [
       "logging",
-      "iam"
+      "iam",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "記録対象リソースの選定",
@@ -2678,7 +3285,8 @@
     ],
     "alternatives": [],
     "commonRuleRefs": [
-      "iam"
+      "iam",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "OU 設計",
@@ -2762,7 +3370,10 @@
     ],
     "commonRuleRefs": [
       "network",
-      "encryption"
+      "encryption",
+      "backup",
+      "cost",
+      "tagging"
     ],
     "productionPrereqs": [
       "private 配置／接続制御",
@@ -2924,7 +3535,8 @@
     ],
     "alternatives": [],
     "commonRuleRefs": [
-      "network"
+      "network",
+      "cost"
     ],
     "productionPrereqs": [
       "ルートテーブル／アタッチメント設計",
@@ -3007,7 +3619,8 @@
     ],
     "alternatives": [],
     "commonRuleRefs": [
-      "iam"
+      "iam",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "各ステージの最小権限ロール",
@@ -3177,7 +3790,8 @@
     ],
     "alternatives": [],
     "commonRuleRefs": [
-      "iam"
+      "iam",
+      "iam-templates"
     ],
     "productionPrereqs": [
       "デプロイ設定（Blue/Green 等）",
@@ -3526,7 +4140,8 @@
     ],
     "commonRuleRefs": [
       "iam",
-      "network"
+      "network",
+      "cost"
     ],
     "productionPrereqs": [
       "タスクの vCPU／メモリ適正化",
@@ -3613,7 +4228,8 @@
     ],
     "commonRuleRefs": [
       "logging",
-      "iam"
+      "iam",
+      "monitoring"
     ],
     "productionPrereqs": [
       "アプリの計装（SDK／エージェント）",
@@ -3691,7 +4307,9 @@
       "organizations"
     ],
     "alternatives": [],
-    "commonRuleRefs": [],
+    "commonRuleRefs": [
+      "cost"
+    ],
     "productionPrereqs": [
       "コスト配賦タグの設計",
       "レポート／予測の活用",
@@ -3771,7 +4389,9 @@
       "organizations"
     ],
     "alternatives": [],
-    "commonRuleRefs": [],
+    "commonRuleRefs": [
+      "cost"
+    ],
     "productionPrereqs": [
       "予算しきい値／通知先(SNS)設定",
       "予測ベースのアラート",
@@ -4447,7 +5067,8 @@
     ],
     "alternatives": [],
     "commonRuleRefs": [
-      "network"
+      "network",
+      "cost"
     ],
     "productionPrereqs": [
       "接続ロケーション／回線手配",
