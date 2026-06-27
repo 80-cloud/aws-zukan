@@ -2971,5 +2971,516 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "codepipeline",
+    "name": "AWS CodePipeline",
+    "category": "devtools",
+    "tier": 1,
+    "oneLiner": "ソフトウェアのリリース工程（ビルド→テスト→デプロイ）を自動化する CI/CD オーケストレーション。",
+    "mainUseCases": [
+      "CI/CD パイプラインの自動化",
+      "多段リリース工程の制御",
+      "ビルド／デプロイ各サービスの連携"
+    ],
+    "notSuitableFor": [
+      "手作業のアドホックなデプロイ",
+      "CI/CD の前提が無い小規模"
+    ],
+    "companions": [
+      {
+        "serviceId": "codebuild",
+        "role": "ビルド／テスト段"
+      },
+      {
+        "serviceId": "codedeploy",
+        "role": "デプロイ段"
+      },
+      {
+        "serviceId": "iam",
+        "role": "実行権限"
+      }
+    ],
+    "related": [
+      "codebuild",
+      "codedeploy"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "各ステージの最小権限ロール",
+      "承認ステップ／品質ゲート",
+      "失敗時の通知"
+    ],
+    "costGotcha": "アクティブなパイプライン数で課金。常設パイプラインの整理。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "アクティブパイプライン数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "定義は IaC 管理。",
+      "changeImpact": "パイプライン変更は次回実行から反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/codepipeline/",
+      "pricing": "https://aws.amazon.com/codepipeline/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "codebuild",
+    "name": "AWS CodeBuild",
+    "category": "devtools",
+    "tier": 1,
+    "oneLiner": "ビルド基盤を持たずにコンパイル・テスト・成果物作成を行うマネージドなビルドサービス。",
+    "mainUseCases": [
+      "CI のビルド／テスト",
+      "コンテナイメージのビルド",
+      "Jenkins 基盤を持たないビルド実行"
+    ],
+    "notSuitableFor": [
+      "長時間の常駐処理",
+      "状態を持つ常設サーバー用途",
+      "対話的デバッグ"
+    ],
+    "companions": [
+      {
+        "serviceId": "codepipeline",
+        "role": "パイプライン段"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "イメージ出力先"
+      },
+      {
+        "serviceId": "iam",
+        "role": "実行権限"
+      }
+    ],
+    "related": [
+      "codepipeline",
+      "ecr"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "ビルド環境／イメージの固定",
+      "シークレットの安全な参照",
+      "キャッシュでビルド短縮"
+    ],
+    "costGotcha": "ビルド時間（分）で課金。並列度・実行頻度に注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "ビルド時間（分）"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "定義は IaC 管理。",
+      "changeImpact": "設定変更は次回ビルドから反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/codebuild/",
+      "pricing": "https://aws.amazon.com/codebuild/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "codedeploy",
+    "name": "AWS CodeDeploy",
+    "category": "devtools",
+    "tier": 1,
+    "oneLiner": "EC2／ECS／Lambda へのデプロイを自動化するサービス。Blue/Green やカナリアで安全に切替える。",
+    "mainUseCases": [
+      "EC2／ECS／Lambda の自動デプロイ",
+      "Blue/Green・カナリアでの段階切替",
+      "大量ホストへの一括デプロイ"
+    ],
+    "notSuitableFor": [
+      "ビルドそのもの（→ CodeBuild）",
+      "単純な手動コピー配置"
+    ],
+    "companions": [
+      {
+        "serviceId": "codepipeline",
+        "role": "パイプライン段"
+      },
+      {
+        "serviceId": "ec2",
+        "role": "デプロイ先"
+      },
+      {
+        "serviceId": "ecs",
+        "role": "デプロイ先"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "デプロイ先"
+      }
+    ],
+    "related": [
+      "ec2",
+      "ecs",
+      "codepipeline"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "デプロイ設定（Blue/Green 等）",
+      "ヘルスチェック／自動ロールバック",
+      "最小権限ロール"
+    ],
+    "costGotcha": "EC2／オンプレ更新は課金、Lambda／ECS 向けは無料枠あり。対象により異なる。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "オンプレ更新数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "定義は IaC 管理。",
+      "changeImpact": "デプロイ設定変更は次回から反映。",
+      "failover": "自動ロールバックに対応。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/codedeploy/",
+      "pricing": "https://aws.amazon.com/codedeploy/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "opensearch",
+    "name": "Amazon OpenSearch Service",
+    "category": "analytics",
+    "tier": 1,
+    "oneLiner": "検索・ログ分析・ベクトル検索を行うマネージドな検索／分析エンジン。全文検索や可観測性に使う。",
+    "mainUseCases": [
+      "ログ分析・可観測性",
+      "全文検索／ベクトル検索",
+      "RAG など AI 連携の検索"
+    ],
+    "notSuitableFor": [
+      "リレーショナルなトランザクション処理（→ RDS）",
+      "複雑な集計の DWH 用途（→ Redshift）"
+    ],
+    "companions": [
+      {
+        "serviceId": "cloudwatch",
+        "role": "ログ取り込み元"
+      },
+      {
+        "serviceId": "s3",
+        "role": "データ／スナップショット"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "cloudwatch",
+      "kinesis"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "network",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "ノード／シャード設計",
+      "private 配置／アクセス制御",
+      "スナップショット／暗号化"
+    ],
+    "costGotcha": "ノード時間＋ストレージで課金。常時起動クラスタの固定費に注意。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "ノード時間",
+        "ストレージ"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "自動スナップショット対応。",
+      "changeImpact": "ノード変更は再構成を伴うことがある。",
+      "failover": "マルチ AZ 構成が可能。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/opensearch-service/",
+      "pricing": "https://aws.amazon.com/opensearch-service/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "ses",
+    "name": "Amazon SES",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "アプリからメールを送受信するマネージドなメールサービス。トランザクション／一斉配信に使う。",
+    "mainUseCases": [
+      "トランザクションメール（通知・確認）",
+      "ニュースレター／一斉配信",
+      "アプリからの大量送信"
+    ],
+    "notSuitableFor": [
+      "迷惑メール／無許可の一斉送信",
+      "リアルタイムのアプリ間連携（→ SNS/SQS）"
+    ],
+    "companions": [
+      {
+        "serviceId": "sns",
+        "role": "バウンス／苦情の通知"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "受信処理"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "sns",
+      "lambda"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "送信ドメイン認証（SPF/DKIM/DMARC）",
+      "バウンス／苦情の処理",
+      "サンドボックス解除の申請"
+    ],
+    "costGotcha": "送信通数＋添付データ量で課金。バウンス率が高いと送信制限のリスク。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "送信通数",
+        "受信",
+        "データ量"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "認証／設定変更は反映に時間を要することがある。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/ses/",
+      "pricing": "https://aws.amazon.com/ses/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "appsync",
+    "name": "AWS AppSync",
+    "category": "integration",
+    "tier": 1,
+    "oneLiner": "マネージドな GraphQL／リアルタイム pub-sub API を構築するサービス。複数データ源を 1 つの API に。",
+    "mainUseCases": [
+      "GraphQL API（複数データ源を統合）",
+      "リアルタイム購読（WebSocket）",
+      "モバイル／SPA のデータ取得"
+    ],
+    "notSuitableFor": [
+      "単純な REST 要求／応答（→ API Gateway）",
+      "GraphQL が不要な構成"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "リゾルバ"
+      },
+      {
+        "serviceId": "dynamodb",
+        "role": "データ源"
+      },
+      {
+        "serviceId": "cognito",
+        "role": "認証"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "apigateway",
+      "lambda",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "apigateway"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "スキーマ／リゾルバ設計",
+      "認証（Cognito/IAM）設定",
+      "購読のスケール設計"
+    ],
+    "costGotcha": "クエリ／データ変更の操作数＋リアルタイム接続時間で課金。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "操作数",
+        "リアルタイム接続時間",
+        "データ転送"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "スキーマ／定義は IaC 管理。",
+      "changeImpact": "スキーマ変更はクライアント影響に注意。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/appsync/",
+      "pricing": "https://aws.amazon.com/appsync/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
