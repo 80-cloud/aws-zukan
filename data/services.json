@@ -6730,5 +6730,108 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "storagegateway",
+    "name": "AWS Storage Gateway",
+    "category": "storage",
+    "oneLiner": "オンプレミスのアプライアンスとクラウドストレージを繋ぐハイブリッドストレージ。ファイル/テープ/ボリュームの各ゲートウェイ型を提供する。",
+    "mainUseCases": [
+      "オンプレからクラウドストレージ（S3 等）への透過アクセス",
+      "テープ運用のクラウド移行（Tape Gateway によるアーカイブ）",
+      "ハイブリッド環境のバックアップ・段階的移行"
+    ],
+    "notSuitableFor": [
+      "クラウド完結のワークロード（その場合は S3/EFS を直接使う）",
+      "大量データの一括コピー/同期そのもの（それは DataSync）"
+    ],
+    "productionPrereqs": [
+      "オンプレ/EC2 上のゲートウェイアプライアンス",
+      "バックエンドのストレージ（S3 等）",
+      "IAM 権限・ネットワーク帯域の確保"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "保管容量・データ転送・取り出し"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "s3",
+      "datasync",
+      "fsx",
+      "ebs"
+    ],
+    "alternatives": [
+      "datasync"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/storagegateway/latest/userguide/WhatIsStorageGateway.html",
+      "pricing": "https://aws.amazon.com/storagegateway/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "transferfamily",
+    "name": "AWS Transfer Family",
+    "category": "storage",
+    "oneLiner": "SFTP/FTPS/FTP/AS2 などのプロトコルで S3・EFS へファイルを送受信できる、サーバー管理不要のマネージドファイル転送。",
+    "mainUseCases": [
+      "取引先・パートナーとの B2B ファイル交換（SFTP/AS2）",
+      "自前 SFTP サーバーのクラウド移行（クライアント設定を変えずに）",
+      "データレイクへの外部からのアップロード受け口"
+    ],
+    "notSuitableFor": [
+      "アプリ内のデータ授受（その場合は SDK/API で S3 を直接操作）",
+      "内部の大量データ同期そのもの（それは DataSync）"
+    ],
+    "productionPrereqs": [
+      "プロトコル有効化サーバーまたは web アプリの構成",
+      "ID プロバイダ（独自/Cognito/AD 等）の設定",
+      "S3/EFS とアクセス権限（IAM）"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "エンドポイント稼働時間・転送データ量"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "s3",
+      "efs",
+      "datasync"
+    ],
+    "alternatives": [
+      "datasync"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html",
+      "pricing": "https://aws.amazon.com/aws-transfer-family/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
