@@ -7,6 +7,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   compute: 'コンピューティング', storage: 'ストレージ', database: 'データベース',
   networking: 'ネットワーキング', security: 'セキュリティ', monitoring: '監視・運用',
   integration: 'アプリ統合', management: '管理・ガバナンス',
+  analytics: '分析・データ',
 }
 const chip = (active: boolean) =>
   `rounded-full border px-3 py-1 ${active ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50'}`
