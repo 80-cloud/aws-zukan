@@ -3,115 +3,384 @@
     "id": "pat-static-site",
     "name": "静的サイト/LP/ドキュメントの公開",
     "goal": "サーバー処理が不要な、ファイル配信中心のサイトを公開する",
-    "recommendedStack": ["s3", "cloudfront", "route53", "acm"],
-    "stackRoles": [{"serviceId": "s3", "role": "静的ファイルの配信元（オリジン）"}, {"serviceId": "cloudfront", "role": "CDN・HTTPS 配信"}, {"serviceId": "route53", "role": "DNS（ドメイン名の解決）"}, {"serviceId": "acm", "role": "TLS 証明書（HTTPS 用）"}],
+    "recommendedStack": [
+      "s3",
+      "cloudfront",
+      "route53",
+      "acm"
+    ],
+    "stackRoles": [
+      {
+        "serviceId": "s3",
+        "role": "静的ファイルの配信元（オリジン）"
+      },
+      {
+        "serviceId": "cloudfront",
+        "role": "CDN・HTTPS 配信"
+      },
+      {
+        "serviceId": "route53",
+        "role": "DNS（ドメイン名の解決）"
+      },
+      {
+        "serviceId": "acm",
+        "role": "TLS 証明書（HTTPS 用）"
+      }
+    ],
     "rationale": "常時稼働サーバーを持たず、配信は CDN に任せる。OS パッチや監視の負担が小さい。",
     "antiPatterns": [
-      { "stack": ["ec2"], "why": "この要件では EC2 上に Web サーバーを置くと、OS パッチ・監視・スケールの運用負荷が相対的に高い。", "source": null }
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "この要件では EC2 上に Web サーバーを置くと、OS パッチ・監視・スケールの運用負荷が相対的に高い。",
+        "source": null
+      }
     ],
-    "requiredGovernance": ["HTTPS", "CloudFront 経由のみのアクセス", "アクセスログ"],
-    "optional": ["WAF", "CI/CD", "監視通知"],
-    "suitableConditions": ["動的なサーバー処理が不要", "更新がファイル配信中心"],
-    "alternatives": ["Amplify Hosting", "コンテナ/EC2 上の Web サーバー"],
+    "requiredGovernance": [
+      "HTTPS",
+      "CloudFront 経由のみのアクセス",
+      "アクセスログ"
+    ],
+    "optional": [
+      "WAF",
+      "CI/CD",
+      "監視通知"
+    ],
+    "suitableConditions": [
+      "動的なサーバー処理が不要",
+      "更新がファイル配信中心"
+    ],
+    "alternatives": [
+      "Amplify Hosting",
+      "コンテナ/EC2 上の Web サーバー"
+    ],
     "notes": "認証付き画面や動的 API は別途設計が必要。",
     "difficulty": 1,
-    "evaluation": { "security": "○", "availability": "◎", "opsLoad": "◎", "cost": "◎", "scalability": "○", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
-    "scenarioTags": ["外部公開サイト", "コーポレートサイト/LP", "ドキュメントサイト"],
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "◎",
+      "cost": "◎",
+      "scalability": "○",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開サイト",
+      "コーポレートサイト/LP",
+      "ドキュメントサイト"
+    ],
     "realWorldNotes": []
   },
   {
     "id": "pat-alb-frontend",
     "name": "ALB で EC2 アプリを公開",
     "goal": "VPC 内の EC2 アプリ(Spring Boot 等)をインターネットに公開する",
-    "recommendedStack": ["alb", "ec2", "vpc", "securitygroup"],
+    "recommendedStack": [
+      "alb",
+      "ec2",
+      "vpc",
+      "securitygroup"
+    ],
     "rationale": "ALB を前段に置き HTTPS 終端と複数 AZ 分散を担う。EC2 への直接 SSH は開けず、ALB の SG からのみアプリポートを許可する。",
     "antiPatterns": [
-      { "stack": ["alb"], "why": "public サブネットが 1 AZ にしかないと、インターネット向け ALB の「2 AZ に public サブネット」要件を満たせず作成できない。", "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5" },
-      { "stack": ["ec2", "securitygroup"], "why": "SSH(22) を 0.0.0.0/0 で開けるのは総当たりの標的になる。ALB 経由なら SSH は不要で開けない。", "source": "https://qiita.com/80-cloud/items/f8f04de4a9206f8ffa95" }
+      {
+        "stack": [
+          "alb"
+        ],
+        "why": "public サブネットが 1 AZ にしかないと、インターネット向け ALB の「2 AZ に public サブネット」要件を満たせず作成できない。",
+        "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5"
+      },
+      {
+        "stack": [
+          "ec2",
+          "securitygroup"
+        ],
+        "why": "SSH(22) を 0.0.0.0/0 で開けるのは総当たりの標的になる。ALB 経由なら SSH は不要で開けない。",
+        "source": "https://qiita.com/80-cloud/items/f8f04de4a9206f8ffa95"
+      }
     ],
-    "requiredGovernance": ["2 AZ に public サブネット", "ALB で HTTPS 終端", "アプリポートは ALB の SG からのみ許可", "SSH は開けない/絞る"],
-    "optional": ["WAF", "アクセスログ", "Auto Scaling"],
-    "suitableConditions": ["常時稼働する動的アプリ", "VPC 内に EC2 がある"],
-    "alternatives": ["CloudFront + S3(静的のみ)", "ECS/Fargate + ALB"],
+    "requiredGovernance": [
+      "2 AZ に public サブネット",
+      "ALB で HTTPS 終端",
+      "アプリポートは ALB の SG からのみ許可",
+      "SSH は開けない/絞る"
+    ],
+    "optional": [
+      "WAF",
+      "アクセスログ",
+      "Auto Scaling"
+    ],
+    "suitableConditions": [
+      "常時稼働する動的アプリ",
+      "VPC 内に EC2 がある"
+    ],
+    "alternatives": [
+      "CloudFront + S3(静的のみ)",
+      "ECS/Fargate + ALB"
+    ],
     "notes": "鍵名の直書きは避け、パラメータ化する（環境を選ばなくなる）。",
     "difficulty": 3,
-    "evaluation": { "security": "○", "availability": "◎", "opsLoad": "△", "cost": "○", "scalability": "○", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
-    "scenarioTags": ["外部公開アプリ", "オンプレ移行"],
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "△",
+      "cost": "○",
+      "scalability": "○",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "オンプレ移行"
+    ],
     "stackRoles": [
-      { "serviceId": "alb", "role": "ロードバランサ・HTTPS 終端" },
-      { "serviceId": "ec2", "role": "アプリ実行" },
-      { "serviceId": "vpc", "role": "ネットワーク（public/private）" },
-      { "serviceId": "securitygroup", "role": "通信制御（ALB→EC2）" }
+      {
+        "serviceId": "alb",
+        "role": "ロードバランサ・HTTPS 終端"
+      },
+      {
+        "serviceId": "ec2",
+        "role": "アプリ実行"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク（public/private）"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "通信制御（ALB→EC2）"
+      }
     ],
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5", "gotcha": "「サブネットを作ってある」と「2 AZ に public サブネットがある」は別物。2 つ目の AZ に public サブネット(IGW 経路つき)を足して解決した。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/f094039371ebe1bea1a5",
+        "gotcha": "「サブネットを作ってある」と「2 AZ に public サブネットがある」は別物。2 つ目の AZ に public サブネット(IGW 経路つき)を足して解決した。"
+      }
     ]
   },
   {
     "id": "pat-rds-access",
     "name": "RDS への安全な接続",
     "goal": "アプリの DB(RDS)を、外から触れないように隔離しつつ EC2 から使う",
-    "recommendedStack": ["rds", "ec2", "vpc", "securitygroup"],
-    "stackRoles": [{"serviceId": "rds", "role": "データベース（private に隔離）"}, {"serviceId": "ec2", "role": "アプリ実行（DB に接続）"}, {"serviceId": "vpc", "role": "ネットワーク（public/private 分離）"}, {"serviceId": "securitygroup", "role": "通信制御（EC2→RDS のみ許可）"}],
+    "recommendedStack": [
+      "rds",
+      "ec2",
+      "vpc",
+      "securitygroup"
+    ],
+    "stackRoles": [
+      {
+        "serviceId": "rds",
+        "role": "データベース（private に隔離）"
+      },
+      {
+        "serviceId": "ec2",
+        "role": "アプリ実行（DB に接続）"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "ネットワーク（public/private 分離）"
+      },
+      {
+        "serviceId": "securitygroup",
+        "role": "通信制御（EC2→RDS のみ許可）"
+      }
+    ],
     "rationale": "RDS を private サブネットに「パブリックアクセスなし」で置き、許可元を EC2 の SG にする。DB へは VPC 内の EC2 を経由して接続する。",
     "antiPatterns": [
-      { "stack": ["rds"], "why": "パブリックアクセスを有効にして外から直結できるようにすると、攻撃面が広がる。隔離の利点を失う。", "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06" }
+      {
+        "stack": [
+          "rds"
+        ],
+        "why": "パブリックアクセスを有効にして外から直結できるようにすると、攻撃面が広がる。隔離の利点を失う。",
+        "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06"
+      }
     ],
-    "requiredGovernance": ["private サブネット配置", "パブリックアクセスなし", "許可元は EC2 の SG", "DB ポート(5432/3306)のみ許可"],
-    "optional": ["自動バックアップ", "マルチ AZ"],
-    "suitableConditions": ["アプリが VPC 内の EC2 で動く"],
-    "alternatives": ["踏み台/Session Manager 経由の運用接続"],
+    "requiredGovernance": [
+      "private サブネット配置",
+      "パブリックアクセスなし",
+      "許可元は EC2 の SG",
+      "DB ポート(5432/3306)のみ許可"
+    ],
+    "optional": [
+      "自動バックアップ",
+      "マルチ AZ"
+    ],
+    "suitableConditions": [
+      "アプリが VPC 内の EC2 で動く"
+    ],
+    "alternatives": [
+      "踏み台/Session Manager 経由の運用接続"
+    ],
     "notes": "手元の Mac から直結できない(タイムアウト)のは正常。隔離が効いているサイン。",
     "difficulty": 2,
-    "evaluation": { "security": "◎", "availability": "○", "opsLoad": "○", "cost": "○", "scalability": "○", "governanceFit": "◎", "migrationEase": "○", "vendorLockin": "△" },
-    "scenarioTags": ["オンプレ移行", "DB の隔離"],
+    "evaluation": {
+      "security": "◎",
+      "availability": "○",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "○",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "オンプレ移行",
+      "DB の隔離"
+    ],
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06", "gotcha": "許可元を IP でなく SG にすると、EC2 の IP が変わってもルールを直さずに済む。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/6e97c7e8f2076c78ea06",
+        "gotcha": "許可元を IP でなく SG にすると、EC2 の IP が変わってもルールを直さずに済む。"
+      }
     ]
   },
   {
     "id": "pat-tf-state",
     "name": "Terraform のリモート state 管理（bootstrap）",
     "goal": "Terraform の state をチームで共有し、同時 apply の事故を防ぐ",
-    "recommendedStack": ["s3", "dynamodb"],
-    "stackRoles": [{"serviceId": "s3", "role": "state ファイルの保管"}, {"serviceId": "dynamodb", "role": "state ロック（同時実行の排他制御）"}],
+    "recommendedStack": [
+      "s3",
+      "dynamodb"
+    ],
+    "stackRoles": [
+      {
+        "serviceId": "s3",
+        "role": "state ファイルの保管"
+      },
+      {
+        "serviceId": "dynamodb",
+        "role": "state ロック（同時実行の排他制御）"
+      }
+    ],
     "rationale": "state 置き場(S3)を作るための state をどこに置くか、という鶏と卵を、置き場だけを作る小さな bootstrap スタック(ローカル state)で先に解消する。",
     "antiPatterns": [
-      { "stack": ["s3"], "why": "本体コードにいきなり「S3 を backend に使う」と書くと、その S3 がまだ無いため初回が成り立たず詰む(鶏と卵)。", "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4" }
+      {
+        "stack": [
+          "s3"
+        ],
+        "why": "本体コードにいきなり「S3 を backend に使う」と書くと、その S3 がまだ無いため初回が成り立たず詰む(鶏と卵)。",
+        "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4"
+      }
     ],
-    "requiredGovernance": ["置き場 S3 はバージョニング/暗号化/パブリックアクセス遮断", "同時 apply を防ぐロック", "bootstrap で作った置き場は destroy で壊さない"],
+    "requiredGovernance": [
+      "置き場 S3 はバージョニング/暗号化/パブリックアクセス遮断",
+      "同時 apply を防ぐロック",
+      "bootstrap で作った置き場は destroy で壊さない"
+    ],
     "optional": [],
-    "suitableConditions": ["複数人で Terraform を共有する", "state を安全に保管したい"],
-    "alternatives": ["Terraform Cloud 等のマネージド backend"],
+    "suitableConditions": [
+      "複数人で Terraform を共有する",
+      "state を安全に保管したい"
+    ],
+    "alternatives": [
+      "Terraform Cloud 等のマネージド backend"
+    ],
     "notes": "ロック方式はバージョンで変わる。DynamoDB ロックは非推奨化しつつあり、S3 ネイティブロック(use_lockfile)が使える場合がある。新規は公式の現行推奨を確認する。",
     "difficulty": 2,
-    "evaluation": { "security": "○", "availability": "○", "opsLoad": "○", "cost": "◎", "scalability": "○", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
-    "scenarioTags": ["チーム開発基盤", "IaC 導入"],
+    "evaluation": {
+      "security": "○",
+      "availability": "○",
+      "opsLoad": "○",
+      "cost": "◎",
+      "scalability": "○",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "チーム開発基盤",
+      "IaC 導入"
+    ],
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4", "gotcha": "bootstrap はローカル state のまま置き場(S3)だけ作り、その後に本体へ backend を書いてリモート state へ移行する。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/0a0088ccff70d536c2d4",
+        "gotcha": "bootstrap はローカル state のまま置き場(S3)だけ作り、その後に本体へ backend を書いてリモート state へ移行する。"
+      }
     ]
   },
   {
     "id": "pat-ec2-deploy",
     "name": "EC2 への自動デプロイ（手元ビルド→ECR→pull）",
     "goal": "terraform apply 1 発に近い形で、EC2 へアプリを自動デプロイする",
-    "recommendedStack": ["ec2", "ecr", "iam"],
-    "stackRoles": [{"serviceId": "ec2", "role": "アプリ実行（イメージを pull）"}, {"serviceId": "ecr", "role": "コンテナイメージの保管"}, {"serviceId": "iam", "role": "EC2 が ECR から pull する権限"}],
+    "recommendedStack": [
+      "ec2",
+      "ecr",
+      "iam"
+    ],
+    "stackRoles": [
+      {
+        "serviceId": "ec2",
+        "role": "アプリ実行（イメージを pull）"
+      },
+      {
+        "serviceId": "ecr",
+        "role": "コンテナイメージの保管"
+      },
+      {
+        "serviceId": "iam",
+        "role": "EC2 が ECR から pull する権限"
+      }
+    ],
     "rationale": "重いビルドは手元でやり、ECR に push。EC2 は起動時に IAM ロールの一時資格で ECR から pull して動かすだけにする。",
     "antiPatterns": [
-      { "stack": ["ec2"], "why": "EC2 の中でビルドすると、小さいインスタンスでメモリ不足になりやすい。", "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8" },
-      { "stack": ["iam"], "why": "ECR pull 用のアクセスキーを user_data に直書きするのは危険。長期キーを機械に置かない。", "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8" }
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "EC2 の中でビルドすると、小さいインスタンスでメモリ不足になりやすい。",
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8"
+      },
+      {
+        "stack": [
+          "iam"
+        ],
+        "why": "ECR pull 用のアクセスキーを user_data に直書きするのは危険。長期キーを機械に置かない。",
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8"
+      }
     ],
-    "requiredGovernance": ["EC2 には IAM ロールで一時資格を配る", "イメージは EC2 のアーキ(amd64)で焼く", "アクセスキーを直書きしない"],
-    "optional": ["Docker Compose で DB 同居", "CI からの push 自動化"],
-    "suitableConditions": ["コンテナ化済みのアプリ", "勉強用/小規模の自動デプロイ"],
-    "alternatives": ["ECS/Fargate", "Ec2 上で都度ビルド(非推奨)"],
+    "requiredGovernance": [
+      "EC2 には IAM ロールで一時資格を配る",
+      "イメージは EC2 のアーキ(amd64)で焼く",
+      "アクセスキーを直書きしない"
+    ],
+    "optional": [
+      "Docker Compose で DB 同居",
+      "CI からの push 自動化"
+    ],
+    "suitableConditions": [
+      "コンテナ化済みのアプリ",
+      "勉強用/小規模の自動デプロイ"
+    ],
+    "alternatives": [
+      "ECS/Fargate",
+      "Ec2 上で都度ビルド(非推奨)"
+    ],
     "notes": "コンテナ内の localhost は別コンテナの DB に届かない。compose のサービス名(db 等)を宛先にする。",
     "difficulty": 3,
-    "evaluation": { "security": "○", "availability": "○", "opsLoad": "○", "cost": "○", "scalability": "△", "governanceFit": "○", "migrationEase": "○", "vendorLockin": "△" },
-    "scenarioTags": ["勉強用デプロイ", "オンプレ移行"],
+    "evaluation": {
+      "security": "○",
+      "availability": "○",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "△",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "勉強用デプロイ",
+      "オンプレ移行"
+    ],
     "realWorldNotes": [
-      { "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8", "gotcha": "一周目に手作業で踏んだ罠(arm64/amd64・localhost・鍵)を、二周目は user_data の自動化で先回りして全部避けた。" }
+      {
+        "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
+        "gotcha": "一周目に手作業で踏んだ罠(arm64/amd64・localhost・鍵)を、二周目は user_data の自動化で先回りして全部避けた。"
+      }
     ]
   },
   {
@@ -881,6 +1150,151 @@
       {
         "serviceId": "securitygroup",
         "role": "通信制御"
+      }
+    ]
+  },
+  {
+    "id": "pat-serverless-rds",
+    "name": "サーバーレス構成の関係データベース API",
+    "goal": "サーバー管理なしで、結合や集計が必要な関係データを扱う API を提供する",
+    "recommendedStack": [
+      "apigateway",
+      "lambda",
+      "aurora"
+    ],
+    "rationale": "常時起動サーバーを持たずに、結合・トランザクション・任意集計が要る関係データを扱える。Aurora Serverless v2 は需要に応じて容量を自動調整し、無接続時は休止して費用を抑えられる。DynamoDB では難しい関係機能が必要なワークロード向けのサーバーレス選択肢。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "dynamodb"
+        ],
+        "why": "結合・任意条件の集計・全文検索が中心の要件に DynamoDB を無理に充てると、アクセスパターン設計が破綻しやすい。関係機能が要るなら関係 DB を選ぶ。",
+        "source": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WhyDynamoDB.html"
+      }
+    ],
+    "requiredGovernance": [
+      "IAM 最小権限",
+      "VPC 内配置（Lambda と DB の到達経路）",
+      "DB 認証情報の秘匿（Secrets Manager 等）"
+    ],
+    "optional": [
+      "RDS Proxy（接続プール）",
+      "API Gateway 認可（Cognito 等）",
+      "X-Ray トレース"
+    ],
+    "suitableConditions": [
+      "関係データ（結合・集計）が必要",
+      "トラフィックの変動が大きい／断続的",
+      "運用人員が少ない"
+    ],
+    "alternatives": [
+      "ALB + ECS/Fargate + Aurora",
+      "EC2 + RDS"
+    ],
+    "notes": "Aurora Serverless v2 を最小 0 ACU にすると休止からの復帰に十数秒かかる。性能要件が厳しい同期 API では復帰ラグを織り込むか最小容量を 0 にしない。Lambda の同時実行が増えると DB 接続が枯渇しやすいので RDS Proxy を検討する。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "○",
+      "availability": "○",
+      "opsLoad": "◎",
+      "cost": "○",
+      "scalability": "○",
+      "governanceFit": "○",
+      "migrationEase": "◎",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "スタートアップ MVP",
+      "DB の隔離"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "apigateway",
+        "role": "API の入口・認可"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "ビジネスロジック"
+      },
+      {
+        "serviceId": "aurora",
+        "role": "関係データの保存（Serverless v2）"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ]
+  },
+  {
+    "id": "pat-ssm-session-deploy",
+    "name": "鍵レス運用・デプロイ（Session Manager + OIDC）",
+    "goal": "SSH ポートや長期アクセスキーを使わずに、EC2 への運用アクセスと CI/CD デプロイを行う",
+    "recommendedStack": [
+      "ec2",
+      "ssm",
+      "iam"
+    ],
+    "rationale": "Session Manager で SSH ポートを開けず踏み台も置かずに EC2 をシェル操作・ポート転送できる。CI/CD は IAM の OIDC フェデレーションで一時クレデンシャルを使い、長期アクセスキーを置かない。攻撃面と漏洩面を同時に減らせる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "ec2"
+        ],
+        "why": "踏み台(bastion)用の EC2 を別途立てて SSH(22) を晒す構成は、Session Manager があれば不要で、開放ポートと鍵管理の負担・攻撃面を増やす。",
+        "source": "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html"
+      }
+    ],
+    "requiredGovernance": [
+      "IAM 最小権限",
+      "セッションログ（CloudTrail / S3 / CloudWatch）",
+      "OIDC 信頼ポリシーを特定リポ・ブランチに限定"
+    ],
+    "optional": [
+      "VPC エンドポイント（公開 IP なしの接続）",
+      "SSM ドキュメントでの操作標準化"
+    ],
+    "suitableConditions": [
+      "SSH ポートを開けたくない",
+      "CI に長期キーを置きたくない",
+      "アクセスを監査したい"
+    ],
+    "alternatives": [
+      "踏み台(bastion) + SSH 鍵",
+      "CI に IAM アクセスキーを保存"
+    ],
+    "notes": "Session Manager はインスタンスに SSM エージェント稼働と SSM 用 IAM ロール（インスタンスプロファイル）が要る。OIDC は信頼ポリシーを特定リポ・ブランチ（sub クレーム）に絞らないと、別リポからロールを assume されうる。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "○",
+      "opsLoad": "○",
+      "cost": "◎",
+      "scalability": "○",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "CI/CD 導入",
+      "チーム開発基盤",
+      "監査／コンプライアンス"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "ec2",
+        "role": "アプリ実行先"
+      },
+      {
+        "serviceId": "ssm",
+        "role": "ポートを開けない運用アクセス（Session Manager）"
+      },
+      {
+        "serviceId": "iam",
+        "role": "OIDC フェデレーション・最小権限ロール"
       }
     ]
   }
