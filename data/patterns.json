@@ -1801,5 +1801,158 @@
         "role": "移行データの受け皿・アーカイブ"
       }
     ]
+  },
+  {
+    "id": "pat-security-monitoring",
+    "name": "脅威検知・セキュリティ監視",
+    "goal": "AWS 環境の脅威を継続的に検知し、調査・対応につなげる",
+    "recommendedStack": [
+      "guardduty",
+      "securityhub",
+      "cloudtrail",
+      "config",
+      "detective"
+    ],
+    "rationale": "GuardDuty が CloudTrail 管理イベント・VPC フローログ・DNS ログを継続的に解析し、認証情報の侵害・データ持ち出し・暗号資産マイニング・マルウェアなどの脅威を検知する。検知結果（findings）は Security Hub に集約してベストプラクティスや標準への準拠も評価する。Config で構成変更と準拠状態を追跡し、Detective で関連ログを可視化して根本原因を調査する。EventBridge と組み合わせれば検知から通知・自動対応までつなげられる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "cloudtrail"
+        ],
+        "why": "ログを取得するだけで分析・検知の仕組みを持たないと、侵害に気づくのが遅れやすい。検知（GuardDuty）と集約（Security Hub）を組み合わせるのが前提。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "全リージョン・全アカウントで有効化",
+      "findings の通知・対応フロー",
+      "ログの保護（改ざん防止）"
+    ],
+    "optional": [
+      "Amazon Macie（S3 の機微データ検出）",
+      "EventBridge による自動対応",
+      "Organizations での一元管理"
+    ],
+    "suitableConditions": [
+      "本番環境のセキュリティを継続監視したい",
+      "規制・標準への準拠が要る",
+      "複数アカウントを横断で監視したい"
+    ],
+    "alternatives": [
+      "自前の SIEM（運用負荷が大きい）",
+      "サードパーティの検知製品"
+    ],
+    "notes": "検知は有効化して終わりではなく、findings の確認と対応フローまで含めて設計する。マルチアカウントは Organizations 連携での一元管理が向く。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "脅威検知／セキュリティ監視",
+      "監査／コンプライアンス"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "guardduty",
+        "role": "脅威検知（ログを継続解析）"
+      },
+      {
+        "serviceId": "securityhub",
+        "role": "findings 集約・標準準拠チェック"
+      },
+      {
+        "serviceId": "cloudtrail",
+        "role": "API 操作ログ（検知の土台）"
+      },
+      {
+        "serviceId": "config",
+        "role": "構成変更の追跡・準拠評価"
+      },
+      {
+        "serviceId": "detective",
+        "role": "関連ログの可視化・根本原因調査"
+      }
+    ]
+  },
+  {
+    "id": "pat-private-connectivity",
+    "name": "プライベート接続（VPC エンドポイント）",
+    "goal": "VPC から AWS サービスへ、インターネットを経由せずプライベートに接続する",
+    "recommendedStack": [
+      "vpcendpoint",
+      "vpc",
+      "s3",
+      "dynamodb"
+    ],
+    "rationale": "VPC エンドポイントを使うと、インターネットゲートウェイ・NAT・パブリック IP・Direct Connect／VPN なしで VPC から AWS サービスへ接続できる。S3・DynamoDB はゲートウェイ型エンドポイント（追加料金なし）、その他のサービスはインターフェース型エンドポイント（PrivateLink・課金）で接続する。通信が公衆インターネットを経由しないためセキュリティが高まり、到達できるサービスを限定できる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "vpc"
+        ],
+        "why": "プライベートサブネットから S3／DynamoDB へアクセスするためだけに NAT ゲートウェイを通すと、データ転送の課金が増えやすい。ゲートウェイ型エンドポイント（追加料金なし）が向く。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "エンドポイントポリシーで到達先を限定",
+      "最小権限",
+      "プライベート DNS の設定"
+    ],
+    "optional": [
+      "インターフェース型エンドポイント（他サービス向け）",
+      "エンドポイントサービス公開（自社サービスの提供）"
+    ],
+    "suitableConditions": [
+      "プライベートサブネットから AWS サービスを使う",
+      "通信をインターネット経由にしたくない",
+      "NAT の課金を抑えたい"
+    ],
+    "alternatives": [
+      "NAT ゲートウェイ経由（インターネット経由・課金）",
+      "パブリックサブネット配置"
+    ],
+    "notes": "ゲートウェイ型は S3／DynamoDB 専用で追加料金なし。インターフェース型は対象サービスが広い分、時間課金とデータ処理課金がかかる。",
+    "difficulty": 2,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "◎",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "プライベート接続／ネットワーク分離"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "vpcendpoint",
+        "role": "AWS サービスへのプライベート接続口"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "プライベートサブネット"
+      },
+      {
+        "serviceId": "s3",
+        "role": "ゲートウェイ型の接続先（無料）"
+      },
+      {
+        "serviceId": "dynamodb",
+        "role": "ゲートウェイ型の接続先（無料）"
+      }
+    ]
   }
 ]
