@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { zukanRepository } from '../api/zukanRepository'
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -11,6 +12,13 @@ function Block({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export default function About() {
+  // 件数は直書きせずリポジトリ層から動的に数える（データ追加で自動更新・src/api 隔離を活かす）
+  const services = zukanRepository.listServices()
+  const serviceCount = services.length
+  const categoryCount = new Set(services.map(s => s.category)).size
+  const patternCount = zukanRepository.listPatterns().length
+  const ruleCount = zukanRepository.listCommonRules().length
+
   return (
     <article className="max-w-2xl">
       <h1 className="text-2xl font-bold">このアプリの設計思想</h1>
@@ -25,6 +33,14 @@ export default function About() {
           <li>8 軸評価：Well-Architected の 6 本柱＋独自 3 軸（統制適合・移行容易・ベンダー依存）を ◎○△ で。</li>
           <li>創作しない：本文・公式を読んでから書き、体験ベースの記述は出典必須。確認できない欄は空にして未確認を可視化。</li>
           <li>派生ビューはルールベース：設計レビュー観点・セキュリティ注意・隠れコスト・事例検索は既存データから機械的に組み立て、生成 AI の作文に依存しない。</li>
+        </ul>
+      </Block>
+      <Block title="図鑑の規模と網羅性">
+        <ul className="list-disc space-y-1 pl-5">
+          <li>サービス {serviceCount} 件・{categoryCount} カテゴリ（基盤からデータ・分析・AI まで）を収録。</li>
+          <li>構成パターン {patternCount} 件・共通ルール {ruleCount} 件で、サービス単体だけでなく組み合わせと横断ルールまでをカバー。</li>
+          <li>クラウド設計者向けの主要な認定資格で問われる中心的なサービスを広くカバーしています。</li>
+          <li>品質ゲート（参照の実在チェック・評価値の範囲チェック・出典 URL 必須・断定的な言い回しの検出）を CI に常駐させ、規模が増えても破綻させない。</li>
         </ul>
       </Block>
       <Block title="拡張に強い構造">
