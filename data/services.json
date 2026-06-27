@@ -356,6 +356,10 @@
       {
         "source": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html",
         "gotcha": "停止中に無料になるのは DB 稼働時間だけ。プロビジョンドストレージ・バックアップストレージ・（パブリックアクセス可なら）IPv4 アドレスは課金が続く。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_DeleteInstance.html",
+        "gotcha": "削除保護（deletion protection）が有効な DB インスタンスは、そのままでは削除できない。コンソールで作成した DB は既定で有効になっている。削除するには先に modify で削除保護を無効化する必要があり、これが誤削除を防ぐポカヨケとして効く。"
       }
     ]
   },
@@ -717,6 +721,10 @@
       {
         "source": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html",
         "gotcha": "イメージタグに latest のような使い回すタグを使うと、同じタグが上書きされて意図と違うイメージが動くことがある（デプロイ中の新旧混在など）。リポジトリをイミュータブル（IMMUTABLE）にするか、commit SHA など毎回ユニークな固定タグを使う。イミュータブルだと既存タグへの push は ImageTagAlreadyExistsException で弾かれる。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_cannot_pull_image.html",
+        "gotcha": "タスク定義が参照するイメージ名／タグがリポジトリに無いと CannotPullContainerError でタスクが起動できない。リポジトリだけ作ってまだ push していない直後が典型（作成→push→デプロイの順を守る）。また :latest だと元イメージが消えると pull できないので、固定タグを使う。"
       }
     ]
   },
@@ -863,6 +871,14 @@
       {
         "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-custom-origin.html",
         "gotcha": "Origin Protocol Policy を HTTPS Only にしないと、CloudFront とカスタムオリジン（ELB や EC2）の間が HTTP 平文で流れることがある（Match Viewer は閲覧者のプロトコル次第で HTTP になる）。Cookie や JWT が経路上で露出しうるので、本番前に HTTPS Only に設定し、オリジン側に証明書（ELB オリジンなら ACM）を用意する。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-origin-requests.html",
+        "gotcha": "CloudFront は既定で、クエリ文字列・（Host や User-Agent など以外の）ヘッダー・Cookie をオリジンに転送しない。/api/* のように Cookie や Authorization（JWT）をオリジンへ届けたい経路では、オリジンリクエストポリシーを付けないと認証情報が届かず 401 になる。全部転送したい場合は AWS マネージドの AllViewer を当てる。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html",
+        "gotcha": "キャッシュ／オリジンリクエストの AWS マネージドポリシーは、AWS 側で用意された固定の ID を持つ（例: AllViewer = 216adef6-5c7f-47e4-b989-5492eafa07d3）。Terraform などの IaC では自前で作り直さず、この ID または data source で参照する。ID をうろ覚えで直書きすると存在しない参照になり失敗する。"
       }
     ]
   },
