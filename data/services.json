@@ -5808,5 +5808,265 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "neptune",
+    "name": "Amazon Neptune",
+    "category": "database",
+    "oneLiner": "高度につながったデータを扱うフルマネージドのグラフデータベース。Gremlin/openCypher/SPARQL で問い合わせる。",
+    "mainUseCases": [
+      "レコメンド・不正検知・ナレッジグラフ",
+      "ソーシャル/ネットワークなど関係の深いデータ",
+      "ミリ秒で多数の関係をたどるクエリ"
+    ],
+    "notSuitableFor": [
+      "単純な key-value や表形式のデータ（DynamoDB/RDS が向く）",
+      "グラフ構造でない一般的な業務データ"
+    ],
+    "productionPrereqs": [
+      "VPC 内クラスタ",
+      "レプリカ/Multi-AZ",
+      "KMS 暗号化"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption",
+      "backup"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "インスタンス時間・I/O・ストレージ・バックアップ"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "rds",
+      "aurora",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "dynamodb",
+      "rds"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/neptune/latest/userguide/intro.html",
+      "pricing": "https://aws.amazon.com/neptune/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "dax",
+    "name": "Amazon DynamoDB Accelerator (DAX)",
+    "category": "database",
+    "oneLiner": "DynamoDB 専用のインメモリキャッシュ。結果整合の読み取りをマイクロ秒に短縮する。",
+    "mainUseCases": [
+      "読み取りが多くマイクロ秒応答が要る用途",
+      "ホットキー（人気アイテム集中）の負荷軽減",
+      "読み取りキャパシティの過剰確保を抑えてコスト削減"
+    ],
+    "notSuitableFor": [
+      "強整合の読み取りが必須の用途",
+      "書き込みが多い用途（レプリケーション負荷増）",
+      "DynamoDB を使っていない・繰り返し読み取りが少ない用途"
+    ],
+    "productionPrereqs": [
+      "VPC（EC2-VPC のみ）",
+      "対象 DynamoDB テーブル",
+      "DAX クラスタの IAM ロール"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "DAX ノードの稼働時間"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "dynamodb",
+      "elasticache"
+    ],
+    "alternatives": [
+      "elasticache"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html",
+      "pricing": "https://aws.amazon.com/dynamodb/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "memorydb",
+    "name": "Amazon MemoryDB",
+    "category": "database",
+    "oneLiner": "Valkey/Redis 互換で永続性を持つインメモリデータベース。キャッシュ兼プライマリ DB として使える。",
+    "mainUseCases": [
+      "マイクロサービスの高速プライマリ DB",
+      "マイクロ秒読み取り・1桁ミリ秒書き込みが要る用途",
+      "キャッシュと永続 DB を1つにまとめたい場合"
+    ],
+    "notSuitableFor": [
+      "使い捨てキャッシュだけなら ElastiCache が手軽（MemoryDB は永続性ぶんコスト高め）",
+      "大容量を安価に貯める用途（インメモリゆえ割高）"
+    ],
+    "productionPrereqs": [
+      "VPC 内クラスタ",
+      "Multi-AZ（トランザクションログ）",
+      "KMS 暗号化"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "encryption"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ノード稼働時間・データ書き込み量・スナップショット"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "elasticache",
+      "dynamodb"
+    ],
+    "alternatives": [
+      "elasticache"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/memorydb/latest/devguide/what-is-memorydb.html",
+      "pricing": "https://aws.amazon.com/memorydb/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "firehose",
+    "name": "Amazon Data Firehose",
+    "category": "analytics",
+    "oneLiner": "ストリーミングデータを S3/Redshift/OpenSearch 等へ、コード不要でほぼリアルタイムに配送するフルマネージドサービス。",
+    "mainUseCases": [
+      "ログ/イベントを S3・データレイクへ集約",
+      "ニアリアルタイムで Redshift/OpenSearch へロード",
+      "配送前の変換（Lambda）やフォーマット変換"
+    ],
+    "notSuitableFor": [
+      "ミリ秒単位の真のリアルタイム処理や任意のコンシューマ実装（それは Kinesis Data Streams）",
+      "双方向の低遅延メッセージング"
+    ],
+    "productionPrereqs": [
+      "Firehose ストリーム",
+      "配送先（S3 等）と IAM ロール",
+      "バッファサイズ/間隔の設計"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "取り込みデータ量・変換・配送"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "kinesis",
+      "s3",
+      "redshift",
+      "opensearch"
+    ],
+    "alternatives": [
+      "kinesis"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html",
+      "pricing": "https://aws.amazon.com/firehose/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "msk",
+    "name": "Amazon MSK",
+    "category": "analytics",
+    "oneLiner": "Apache Kafka をフルマネージドで動かす。既存の Kafka 資産・ツールをコード変更なしで載せられる。",
+    "mainUseCases": [
+      "既存 Kafka のマネージド移行",
+      "ストリーミングのデータパイプライン",
+      "プロデューサ/コンシューマで高スループット処理"
+    ],
+    "notSuitableFor": [
+      "新規でシンプルに作るなら運用の軽い Kinesis が向く（MSK は Kafka 資産・互換重視のとき）"
+    ],
+    "productionPrereqs": [
+      "VPC・複数 AZ のブローカー",
+      "トピック設計",
+      "MSK Provisioned/Serverless の選択"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "monitoring"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ブローカー稼働時間・ストレージ（Serverless はスループット）"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "kinesis",
+      "lambda"
+    ],
+    "alternatives": [
+      "kinesis"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html",
+      "pricing": "https://aws.amazon.com/msk/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
