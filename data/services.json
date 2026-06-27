@@ -6424,5 +6424,110 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "quicksight",
+    "name": "Amazon Quick Sight（旧 Amazon QuickSight）",
+    "category": "analytics",
+    "oneLiner": "対話的なダッシュボードと BI を提供するデータ可視化サービス（現在は Amazon Quick の一機能。旧 Amazon QuickSight）。",
+    "mainUseCases": [
+      "各種データソースに接続した BI ダッシュボード",
+      "アプリへの分析（ダッシュボード）埋め込み",
+      "部門横断のセルフサービス分析"
+    ],
+    "notSuitableFor": [
+      "大規模データの前処理・変換そのもの（それは EMR/Glue 等）",
+      "リアルタイムの運用メトリクス監視（それは CloudWatch/Grafana）"
+    ],
+    "productionPrereqs": [
+      "データソース接続（S3/Athena/RDS/Redshift 等）",
+      "ユーザー/権限の設計（IAM Identity Center 連携可）",
+      "埋め込みなら認証フローの設計"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ユーザー単位のサブスクリプション（作成者/閲覧者）"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "athena",
+      "redshift",
+      "s3",
+      "glue"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/quicksight/latest/user/welcome.html",
+      "pricing": "https://aws.amazon.com/quicksight/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "emr",
+    "name": "Amazon EMR",
+    "category": "analytics",
+    "oneLiner": "Apache Spark や Hadoop などのビッグデータフレームワークをマネージドなクラスタで実行する分散処理基盤。",
+    "mainUseCases": [
+      "大規模データの分散処理・変換（ETL）",
+      "Spark/Hadoop/Hive 等での分析・BI 前処理",
+      "S3/DynamoDB との大量データ入出力"
+    ],
+    "notSuitableFor": [
+      "対話的な BI ダッシュボード（それは Quick Sight）",
+      "サーバーレスに SQL で集計するだけなら Athena が手軽",
+      "小規模データに常時クラスタは過剰（コスト過多）"
+    ],
+    "productionPrereqs": [
+      "クラスタ構成（インスタンス種別/台数 もしくはサーバーレス）",
+      "S3 等のデータ保管",
+      "IAM ロール（実行ロール）"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "cost"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "クラスタのインスタンス稼働時間・台数"
+      ],
+      "relative": "高"
+    },
+    "related": [
+      "s3",
+      "athena",
+      "glue",
+      "redshift"
+    ],
+    "alternatives": [
+      "glue",
+      "athena"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html",
+      "pricing": "https://aws.amazon.com/emr/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
