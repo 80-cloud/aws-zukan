@@ -7141,5 +7141,106 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "clientvpn",
+    "name": "AWS Client VPN",
+    "category": "networking",
+    "oneLiner": "個々の利用者が OpenVPN クライアントで AWS やオンプレのリソースへ安全に接続する、マネージドなリモートアクセス VPN。",
+    "mainUseCases": [
+      "リモートワーカーの社内/AWS リソースへの安全な接続",
+      "場所を問わない個人単位の VPN アクセス",
+      "AD/証明書/フェデレーションによる認証つきアクセス制御"
+    ],
+    "notSuitableFor": [
+      "ネットワーク同士の常時接続（それは Site-to-Site VPN）",
+      "専用線レベルの安定帯域（それは Direct Connect）"
+    ],
+    "productionPrereqs": [
+      "Client VPN エンドポイントと対象サブネット/TGW",
+      "認証方式（AD/証明書/IdP）の設定",
+      "クライアント CIDR・認可ルール・接続ログ"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "エンドポイント関連付け時間・接続時間・データ転送"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "vpc",
+      "directconnect",
+      "transitgateway"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/what-is.html",
+      "pricing": "https://aws.amazon.com/vpn/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "sitetositevpn",
+    "name": "AWS Site-to-Site VPN",
+    "category": "networking",
+    "oneLiner": "オンプレのネットワークと VPC を IPsec で接続するマネージドな拠点間 VPN。冗長な2トンネルで可用性を確保する。",
+    "mainUseCases": [
+      "オンプレ拠点と VPC のネットワーク間接続（ハイブリッド）",
+      "Direct Connect のバックアップ経路",
+      "Transit Gateway 経由でのマルチ VPC/拠点接続"
+    ],
+    "notSuitableFor": [
+      "個人単位のリモートアクセス（それは Client VPN）",
+      "専用線の安定帯域・低遅延が必須（それは Direct Connect）"
+    ],
+    "productionPrereqs": [
+      "カスタマーゲートウェイ（オンプレ機器）情報",
+      "仮想プライベートゲートウェイ or Transit Gateway",
+      "ルーティング（静的/BGP）の設定"
+    ],
+    "commonRuleRefs": [
+      "network"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "VPN 接続時間・データ転送"
+      ],
+      "relative": "低〜中"
+    },
+    "related": [
+      "vpc",
+      "directconnect",
+      "transitgateway"
+    ],
+    "alternatives": [
+      "directconnect"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html",
+      "pricing": "https://aws.amazon.com/vpn/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
