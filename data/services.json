@@ -111,6 +111,14 @@
       {
         "source": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html",
         "gotcha": "Elastic IP は関連付けの有無にかかわらず課金される。未割り当てのまま放置すると無駄な課金になる。さらに 2024 年以降はすべてのパブリック IPv4（稼働インスタンスに付いたものを含む）が課金対象。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html",
+        "gotcha": "user_data（cloud-init）は既定で、インスタンスを最初に起動したときの1回だけ実行される。再起動しても再実行されないため、パッケージ取得などネットワーク依存の処理が一時障害で失敗すると、そのまま永久に失敗状態になる。スクリプトは何度流しても安全な冪等な作りにし、失敗しうる箇所にはリトライ（指数バックオフ）を入れる。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html",
+        "gotcha": "user_data の中で AWS API / CLI（ECR ログイン、S3 取得など）を呼ぶには、インスタンスにインスタンスプロファイルを付けて起動する必要がある。IAM ロールを作っただけでは EC2 に紐づかず、認証情報が無くて API 呼び出しが失敗する。ロールをインスタンスプロファイルとしてアタッチして起動する。"
       }
     ]
   },
@@ -494,6 +502,10 @@
       {
         "source": "https://qiita.com/80-cloud/items/893794cdcdfa0e7ef258",
         "gotcha": "ターゲットグループを作っても、VPC やターゲット種別が噛み合っていないとリスナーの転送先候補に出てこないことがある。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html",
+        "gotcha": "ALB の接続アイドルタイムアウト（idle_timeout.timeout_seconds）は既定で 60 秒。WebSocket やロングポーリングのように無通信のまま保持したい長時間接続は、60 秒で ALB に切られてしまう。該当用途では idle_timeout.timeout_seconds を必要な長さまで延ばす。"
       }
     ]
   },
@@ -701,6 +713,10 @@
       {
         "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
         "gotcha": "push するイメージのアーキを EC2 に合わせる。Apple Silicon で焼いたまま push すると x86_64 の EC2 で動かない。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html",
+        "gotcha": "イメージタグに latest のような使い回すタグを使うと、同じタグが上書きされて意図と違うイメージが動くことがある（デプロイ中の新旧混在など）。リポジトリをイミュータブル（IMMUTABLE）にするか、commit SHA など毎回ユニークな固定タグを使う。イミュータブルだと既存タグへの push は ImageTagAlreadyExistsException で弾かれる。"
       }
     ]
   },
