@@ -1218,6 +1218,10 @@
       {
         "source": "https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html",
         "gotcha": "ロードバランサ配下のサービスは healthCheckGracePeriodSeconds の既定が 0。起動に時間のかかるアプリ（フレームワーク初期化など）だと、起動完了前に ELB ヘルスチェックで unhealthy と判定されてタスクが停止し、再起動を繰り返すループになりやすい。起動所要時間をカバーする秒数を設定して回避する。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html",
+        "gotcha": "host ネットワークモードでタスクを動かすときは、コンテナを root（UID 0）で動かさず、非root ユーザー（user パラメータ）で動かすのがセキュリティのベストプラクティス。ホストと名前空間を共有する分、コンテナ内 root の影響範囲が広くなるため。"
       }
     ],
     "updatedAt": "2026-06-27",
@@ -4272,7 +4276,12 @@
       "overview": "https://aws.amazon.com/fargate/",
       "pricing": "https://aws.amazon.com/fargate/pricing/"
     },
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html",
+        "gotcha": "コンテナが task definition で指定した memory（ハード上限）を超えようとすると、コンテナはその場で kill される。JVM など既定のヒープ／メタスペース設定が上限を超えると OOM kill→再起動を繰り返すループになりやすい。ランタイム側のメモリ（JVM なら -Xmx やメタスペース）をコンテナの memory 内に収まるよう明示する。"
+      }
+    ],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
   },
