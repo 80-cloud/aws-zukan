@@ -7040,5 +7040,106 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "timestream",
+    "name": "Amazon Timestream",
+    "category": "database",
+    "oneLiner": "時系列データに特化したサーバーレスのマネージドデータベース。直近データはメモリ、過去データは低コスト層へ自動階層化する（LiveAnalytics / InfluxDB の2系統）。",
+    "mainUseCases": [
+      "IoT センサー/産業テレメトリの蓄積・分析",
+      "アプリ/インフラのメトリクス監視データの保存",
+      "時系列の傾向分析（組み込みの時系列関数・SQL）"
+    ],
+    "notSuitableFor": [
+      "汎用の key-value/ドキュメント用途（それは DynamoDB）",
+      "強い整合の業務トランザクション（それは RDS/Aurora）"
+    ],
+    "productionPrereqs": [
+      "データ取り込み経路（IoT Core/Kinesis/MSK 等）",
+      "保持ポリシー（メモリ/磁気ストアの階層設定）",
+      "可視化先（Grafana/BI）・IAM 権限"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "取り込み・保存（階層別）・クエリ量"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "dynamodb",
+      "kinesis",
+      "grafana",
+      "prometheus"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html",
+      "pricing": "https://aws.amazon.com/timestream/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "keyspaces",
+    "name": "Amazon Keyspaces (for Apache Cassandra)",
+    "category": "database",
+    "oneLiner": "Apache Cassandra 互換のサーバーレスなマネージドデータベース。既存の Cassandra アプリ/CQL をそのまま AWS で運用できる。",
+    "mainUseCases": [
+      "既存 Cassandra ワークロードのマネージド移行",
+      "大量書き込み・高スループットのワイドカラム用途",
+      "サーバー運用なしで Cassandra を使いたい場合"
+    ],
+    "notSuitableFor": [
+      "新規で AWS ネイティブに作るなら DynamoDB が第一候補（Cassandra 互換が要件のときに選ぶ）",
+      "リレーショナル/結合主体の用途（それは RDS/Aurora）"
+    ],
+    "productionPrereqs": [
+      "keyspace/table の設計（CQL）",
+      "容量モード（オンデマンド/プロビジョンド）の選定",
+      "IAM 権限・暗号化設定"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "読み書きリクエスト・保存量"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "dynamodb",
+      "rds",
+      "aurora"
+    ],
+    "alternatives": [
+      "dynamodb"
+    ],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/keyspaces/latest/devguide/what-is-keyspaces.html",
+      "pricing": "https://aws.amazon.com/keyspaces/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
