@@ -12,6 +12,17 @@ function ServiceChips({ ids }: { ids: string[] }) {
   if (!ids?.length) return <span className="text-gray-400">—</span>
   return <div className="flex flex-wrap gap-2">{ids.map(id => <Link key={id} to={`/service/${id}`} className="rounded-full border border-gray-200 px-2 py-0.5 text-xs hover:bg-gray-50">{id}</Link>)}</div>
 }
+// 共通ルールのキーを、対応するルール名のリンク（/rules#<key>）にする。未解決のキーはテキスト表示。
+function RuleLinks({ keys }: { keys: string[] }) {
+  if (!keys?.length) return <span className="text-gray-400">—</span>
+  const rules = zukanRepository.listCommonRules()
+  return <ul className="list-disc space-y-1 pl-5">{keys.map(k => {
+    const r = rules.find(x => x.key === k)
+    return <li key={k}>{r
+      ? <Link to={`/rules#${k}`} className="text-blue-600 hover:underline">{r.title}</Link>
+      : <span className="text-gray-700">{k}</span>}</li>
+  })}</ul>
+}
 export default function ServiceDetail() {
   const { id } = useParams()
   const s = id ? zukanRepository.getService(id) : null
@@ -34,7 +45,7 @@ export default function ServiceDetail() {
       <Section title="本番前提"><Bullets items={s.productionPrereqs} /></Section>
       {s.realWorldNotes?.length ? <Section title="一次体験ノート（出典つき）"><ul className="space-y-2">{s.realWorldNotes.map((n, i) => <li key={i} className="rounded-md bg-amber-50 p-3"><p>{n.gotcha}</p><a href={n.source} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">出典</a></li>)}</ul></Section> : null}
       {s.links && Object.keys(s.links).length > 0 && <Section title="公式リンク"><div className="flex flex-wrap gap-3">{Object.entries(s.links).map(([k, url]) => <a key={k} href={url} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">{k}</a>)}</div></Section>}
-      <Section title="共通ルール"><Bullets items={s.commonRuleRefs} /></Section>
+      <Section title="共通ルール"><RuleLinks keys={s.commonRuleRefs} /></Section>
       <footer className="mt-8 text-xs text-gray-400">{s.updatedAt && <span>更新 {s.updatedAt} </span>}{s.verifiedAt && <span>/ 確認 {s.verifiedAt}</span>}</footer>
     </article>
   )
