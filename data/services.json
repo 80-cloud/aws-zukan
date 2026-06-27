@@ -6833,5 +6833,107 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "networkfirewall",
+    "name": "AWS Network Firewall",
+    "category": "security",
+    "oneLiner": "VPC の境界トラフィックをフィルタリングするステートフルなマネージドネットワークファイアウォール（IDS/IPS）。Suricata 互換ルールに対応。",
+    "mainUseCases": [
+      "VPC の出入口（IGW/NAT/VPN/Direct Connect）でのトラフィック制御",
+      "送信（egress）制御＝許可したドメイン/IP のみ通す",
+      "ディープパケットインスペクション・侵入防止（IPS）"
+    ],
+    "notSuitableFor": [
+      "Web アプリ層（HTTP）の攻撃防御（それは WAF）",
+      "インスタンス単位の通信制御（それは セキュリティグループ）"
+    ],
+    "productionPrereqs": [
+      "専用のファイアウォール用サブネット",
+      "ルートテーブルでファイアウォール経由に誘導",
+      "ルールグループ/ポリシー設計・ログ出力先"
+    ],
+    "commonRuleRefs": [
+      "network",
+      "iam",
+      "logging"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "エンドポイント稼働時間・処理データ量・ログ"
+      ],
+      "relative": "中〜高"
+    },
+    "related": [
+      "vpc",
+      "waf",
+      "securitygroup",
+      "firewallmanager"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 3,
+      "ops": 3,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html",
+      "pricing": "https://aws.amazon.com/network-firewall/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "firewallmanager",
+    "name": "AWS Firewall Manager",
+    "category": "security",
+    "oneLiner": "複数アカウント横断でファイアウォール系の保護（WAF/Shield/Network Firewall/セキュリティグループ/DNS Firewall）を一元管理するサービス。",
+    "mainUseCases": [
+      "組織（AWS Organizations）全体への保護ポリシーの一括適用",
+      "新規アカウント/リソースへの保護の自動付与",
+      "WAF/Shield/Network Firewall 等のルールの集中管理・コンプライアンス可視化"
+    ],
+    "notSuitableFor": [
+      "単一アカウントだけの管理（その規模では過剰）",
+      "保護そのものの実体（実体は WAF/Shield/Network Firewall 等。これは束ねる役）"
+    ],
+    "productionPrereqs": [
+      "AWS Organizations の有効化",
+      "Firewall Manager 管理者アカウントの指定",
+      "AWS Config の有効化"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ポリシー単位＋背後の WAF/Config 等の利用料"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "waf",
+      "shield",
+      "networkfirewall",
+      "organizations"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 3
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/waf/latest/developerguide/fms-chapter.html",
+      "pricing": "https://aws.amazon.com/firewall-manager/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
