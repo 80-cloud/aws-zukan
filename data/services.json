@@ -107,6 +107,10 @@
       {
         "source": "https://qiita.com/80-cloud/items/9e5688260032e85098e8",
         "gotcha": "手元が Apple Silicon(arm64) だと、何もしないと arm64 イメージができ EC2(x86_64) で exec format error。ビルド時に --platform linux/amd64 を付ける。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html",
+        "gotcha": "Elastic IP は関連付けの有無にかかわらず課金される。未割り当てのまま放置すると無駄な課金になる。さらに 2024 年以降はすべてのパブリック IPv4（稼働インスタンスに付いたものを含む）が課金対象。"
       }
     ]
   },
@@ -332,6 +336,14 @@
       {
         "source": "https://qiita.com/80-cloud/items/d3d33949fafade4712eb",
         "gotcha": "無料利用枠の上限(同時に使える DB インスタンス数など)に当たると作成自体が失敗する。Terraform でも原因はコードでなく枠だったことがある。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html",
+        "gotcha": "一時停止できるのは最大 7 連続日まで。7 日を過ぎると RDS が自動で再起動する（必要なメンテナンスに追従するため）。それより長く止めたい場合はスケジュールで止め直す仕組みが要る。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html",
+        "gotcha": "停止中に無料になるのは DB 稼働時間だけ。プロビジョンドストレージ・バックアップストレージ・（パブリックアクセス可なら）IPv4 アドレスは課金が続く。"
       }
     ]
   },
@@ -819,7 +831,12 @@
       "changeImpact": "設定変更後、エッジへの反映に時間がかかることがある。",
       "failover": "オリジングループで複数オリジンへのフェイルオーバーを構成できる。"
     },
-    "realWorldNotes": []
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GeneratingCustomErrorResponses.html",
+        "gotcha": "S3＋CloudFront で SPA を配信し、存在しないパスでも index.html を返したい場合は、カスタムエラーレスポンスで該当ステータス→/index.html・レスポンスコード 200 に変換する。OAC＋非公開バケットでは存在しないキーが 404 でなく 403 で返ることがあるため、変換対象のコードを実際の応答に合わせる。"
+      }
+    ]
   },
   {
     "id": "route53",
