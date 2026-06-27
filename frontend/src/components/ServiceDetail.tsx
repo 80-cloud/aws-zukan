@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { zukanRepository } from '../api/zukanRepository'
+import { needsReview } from '../lib/freshness'
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return <section className="mt-6"><h2 className="text-sm font-semibold text-gray-500">{title}</h2><div className="mt-2 text-sm text-gray-800">{children}</div></section>
 }
@@ -46,7 +47,7 @@ export default function ServiceDetail() {
       {s.realWorldNotes?.length ? <Section title="一次体験ノート（出典つき）"><ul className="space-y-2">{s.realWorldNotes.map((n, i) => <li key={i} className="rounded-md bg-amber-50 p-3"><p>{n.gotcha}</p><a href={n.source} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">出典</a></li>)}</ul></Section> : null}
       {s.links && Object.keys(s.links).length > 0 && <Section title="公式リンク"><div className="flex flex-wrap gap-3">{Object.entries(s.links).map(([k, url]) => <a key={k} href={url} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">{k}</a>)}</div></Section>}
       <Section title="共通ルール"><RuleLinks keys={s.commonRuleRefs} /></Section>
-      <footer className="mt-8 text-xs text-gray-400">{s.updatedAt && <span>更新 {s.updatedAt} </span>}{s.verifiedAt && <span>/ 確認 {s.verifiedAt}</span>}</footer>
+      <footer className="mt-8 text-xs text-gray-400">{s.updatedAt && <span>更新 {s.updatedAt} </span>}{s.verifiedAt && <span>/ 確認 {s.verifiedAt}</span>}{needsReview(s.verifiedAt) && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-amber-700">要確認</span>}</footer>
     </article>
   )
 }
