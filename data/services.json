@@ -7242,5 +7242,104 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "controltower",
+    "name": "AWS Control Tower",
+    "category": "management",
+    "oneLiner": "ベストプラクティスに沿ったマルチアカウント環境（ランディングゾーン）を短時間で構築・統制するサービス。Organizations 等を束ねてガードレールを適用する。",
+    "mainUseCases": [
+      "マルチアカウントのランディングゾーン構築",
+      "ガードレール（予防/発見/事前）による継続的なガバナンス",
+      "Account Factory による標準化されたアカウント発行"
+    ],
+    "notSuitableFor": [
+      "単一アカウント運用（その規模では不要）",
+      "個別リソースの細かな設定そのもの（実体は Organizations/Config/Service Catalog 等）"
+    ],
+    "productionPrereqs": [
+      "AWS Organizations（連携の土台）",
+      "管理アカウントと OU 設計",
+      "ログ集約・IAM Identity Center の設定"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "Control Tower 自体は無料（背後の Config/CloudTrail/S3 等に課金）"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "organizations",
+      "config",
+      "cloudtrail",
+      "servicecatalog"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 3
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/controltower/latest/userguide/what-is-control-tower.html",
+      "pricing": "https://aws.amazon.com/controltower/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "servicecatalog",
+    "name": "AWS Service Catalog",
+    "category": "management",
+    "oneLiner": "組織が承認した IT サービス/製品のカタログを作り、利用者がセルフサービスで承認済みリソースを発行できるようにするサービス。",
+    "mainUseCases": [
+      "承認済み構成（製品）のセルフサービス発行",
+      "標準化＝起動できるリージョン/インスタンス種別等の制限",
+      "ポートフォリオ単位の権限管理・バージョン管理"
+    ],
+    "notSuitableFor": [
+      "インフラの定義そのもの（製品の実体は CloudFormation テンプレート）",
+      "個人開発で承認フローが不要な場合"
+    ],
+    "productionPrereqs": [
+      "製品（CloudFormation テンプレート）の用意",
+      "ポートフォリオと制約の設計",
+      "IAM による利用者/グループへの付与"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "API コール数"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "cloudformation",
+      "organizations",
+      "controltower"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/servicecatalog/latest/adminguide/introduction.html",
+      "pricing": "https://aws.amazon.com/servicecatalog/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
