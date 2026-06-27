@@ -9,6 +9,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   integration: 'アプリ統合', management: '管理・ガバナンス',
   analytics: '分析・データ',
   devtools: '開発者ツール',
+  ai: 'AI・機械学習',
 }
 const chip = (active: boolean) =>
   `rounded-full border px-3 py-1 ${active ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50'}`
