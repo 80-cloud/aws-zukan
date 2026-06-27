@@ -7341,5 +7341,158 @@
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27",
     "realWorldNotes": []
+  },
+  {
+    "id": "directoryservice",
+    "name": "AWS Directory Service",
+    "category": "security",
+    "oneLiner": "Microsoft Active Directory（AD）をマネージドで使うためのサービス群。フルマネージドの Managed Microsoft AD・既存ADへ橋渡しする AD Connector・小規模向け Simple AD から選ぶ。",
+    "mainUseCases": [
+      "Windows ワークロードや AD 対応アプリの認証基盤",
+      "WorkSpaces 等 AWS マネージドアプリのユーザー管理",
+      "既存オンプレ AD と AWS の連携（AD Connector）"
+    ],
+    "notSuitableFor": [
+      "SaaS アプリの大規模なエンドユーザー認証（それは Cognito）",
+      "AWS アカウント/アプリへの SSO 割り当てそのもの（それは IAM Identity Center）"
+    ],
+    "productionPrereqs": [
+      "VPC と複数 AZ のサブネット",
+      "ディレクトリ種別（Managed AD / AD Connector / Simple AD）の選定",
+      "必要なら既存 AD との信頼関係"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "network"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "ディレクトリの種別・エディション・稼働時間"
+      ],
+      "relative": "中"
+    },
+    "related": [
+      "iam",
+      "cognito",
+      "ec2"
+    ],
+    "alternatives": [
+      "cognito"
+    ],
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/what_is.html",
+      "pricing": "https://aws.amazon.com/directoryservice/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "iamidentitycenter",
+    "name": "AWS IAM Identity Center（旧 AWS SSO）",
+    "category": "security",
+    "oneLiner": "従業員（ワークフォース）に対し、複数の AWS アカウントやアプリへのシングルサインオン（SSO）と権限割り当てを一元管理するサービス（旧 AWS Single Sign-On）。",
+    "mainUseCases": [
+      "複数 AWS アカウントへの SSO とアクセス権限の集中割り当て",
+      "外部 IdP（社内の ID プロバイダ）との一度きりのフェデレーション",
+      "AWS マネージドアプリへの統一ログイン"
+    ],
+    "notSuitableFor": [
+      "アプリ向けのエンドユーザー認証（それは Cognito）",
+      "Windows/AD そのものの提供（それは Directory Service）"
+    ],
+    "productionPrereqs": [
+      "AWS Organizations（組織インスタンスが推奨）",
+      "ID ソース（内蔵 or 外部 IdP）の選定",
+      "権限セットの設計"
+    ],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "IAM Identity Center 自体は追加料金なし"
+      ],
+      "relative": "低"
+    },
+    "related": [
+      "iam",
+      "organizations",
+      "controltower"
+    ],
+    "alternatives": [],
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 3
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html",
+      "pricing": "https://aws.amazon.com/iam/identity-center/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
+  },
+  {
+    "id": "glacier",
+    "name": "Amazon S3 Glacier（アーカイブ用ストレージクラス）",
+    "category": "storage",
+    "oneLiner": "S3 の低コストなアーカイブ用ストレージクラス群（Instant Retrieval / Flexible Retrieval / Deep Archive）。取り出し速度とコストのトレードオフで選ぶ。",
+    "mainUseCases": [
+      "長期保管・コンプライアンス保持のアーカイブ",
+      "アクセス頻度の低いバックアップの長期保存",
+      "ライフサイクルルールで標準クラスから自動移行"
+    ],
+    "notSuitableFor": [
+      "頻繁にアクセスするデータ（標準/標準IA クラス）",
+      "常に即時・低レイテンシが要る用途（Deep Archive は取り出しに時間がかかる）"
+    ],
+    "productionPrereqs": [
+      "S3 バケットとライフサイクルルール",
+      "取り出し時間/コストの要件整理",
+      "必要なら取り出しの優先度設定"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "保存量・取り出し量・取り出し速度"
+      ],
+      "relative": "低（保存）"
+    },
+    "related": [
+      "s3",
+      "backup",
+      "storagegateway"
+    ],
+    "alternatives": [
+      "s3"
+    ],
+    "difficulty": {
+      "tech": 1,
+      "ops": 1,
+      "org": 1
+    },
+    "links": {
+      "overview": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+      "pricing": "https://aws.amazon.com/s3/pricing/"
+    },
+    "tier": 2,
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27",
+    "realWorldNotes": []
   }
 ]
