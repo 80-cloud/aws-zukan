@@ -1954,5 +1954,513 @@
     "realWorldNotes": [],
     "updatedAt": "2026-06-27",
     "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "cognito",
+    "name": "Amazon Cognito",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "Web／モバイルアプリのユーザー認証・ID 管理を提供するサービス。サインインや外部 IdP 連携を担う。",
+    "mainUseCases": [
+      "アプリのサインイン／ユーザー管理（ユーザープール）",
+      "外部 IdP／ソーシャルログイン連携",
+      "M2M（OAuth クライアント認証）"
+    ],
+    "notSuitableFor": [
+      "AWS リソースへの権限付与そのもの（→ IAM）",
+      "複雑な独自認可ロジックの全面代替"
+    ],
+    "companions": [
+      {
+        "serviceId": "apigateway",
+        "role": "認可（オーソライザ）"
+      },
+      {
+        "serviceId": "lambda",
+        "role": "トリガー／カスタム処理"
+      },
+      {
+        "serviceId": "iam",
+        "role": "ロール連携"
+      }
+    ],
+    "related": [
+      "iam",
+      "apigateway"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam"
+    ],
+    "productionPrereqs": [
+      "パスワードポリシー／MFA",
+      "トークン有効期限の設計",
+      "ドメイン／IdP 設定"
+    ],
+    "costGotcha": "月間アクティブユーザー(MAU)で課金。一部の高度なセキュリティ機能は追加課金。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "MAU",
+        "高度なセキュリティ機能"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "プール設定の変更は影響範囲に注意。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/cognito/",
+      "pricing": "https://aws.amazon.com/cognito/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "kinesis",
+    "name": "Amazon Kinesis",
+    "category": "analytics",
+    "tier": 1,
+    "oneLiner": "ストリーミングデータをリアルタイムに取り込み・処理するマネージドサービス。ミリ秒級の連続データ向け。",
+    "mainUseCases": [
+      "リアルタイム分析／モニタリング",
+      "IoT／ログのストリーム取り込み",
+      "イベントのリアルタイム処理"
+    ],
+    "notSuitableFor": [
+      "単発タスクのキュー（→ SQS）",
+      "定期バッチ処理",
+      "低頻度のデータ"
+    ],
+    "companions": [
+      {
+        "serviceId": "lambda",
+        "role": "ストリーム処理"
+      },
+      {
+        "serviceId": "s3",
+        "role": "保存先"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "監視"
+      }
+    ],
+    "related": [
+      "lambda",
+      "s3",
+      "sqs"
+    ],
+    "alternatives": [
+      "sqs"
+    ],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "シャード／キャパシティ設計",
+      "コンシューマのスケール",
+      "保管時暗号化"
+    ],
+    "costGotcha": "シャード時間＋データ量で課金。過剰シャードは無駄、不足はスロットリングになる。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "シャード時間",
+        "データ量"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "ストリームは短期保持（設定）。",
+      "changeImpact": "シャード変更は再分割を伴う。",
+      "failover": "マネージドで冗長。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/kinesis/",
+      "pricing": "https://aws.amazon.com/kinesis/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "athena",
+    "name": "Amazon Athena",
+    "category": "analytics",
+    "tier": 1,
+    "oneLiner": "S3 上のデータを標準 SQL で直接クエリできるサーバーレスな分析サービス。スキャン量で課金。",
+    "mainUseCases": [
+      "S3 のログ／データのアドホック分析",
+      "BI／レポートの元クエリ",
+      "データレイクの探索"
+    ],
+    "notSuitableFor": [
+      "リアルタイム／トランザクション処理（→ RDS／DynamoDB）",
+      "低レイテンシな単件取得"
+    ],
+    "companions": [
+      {
+        "serviceId": "s3",
+        "role": "データ置き場"
+      },
+      {
+        "serviceId": "glue",
+        "role": "データカタログ"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "s3",
+      "glue"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "データの列指向化／分割（コスト削減）",
+      "Glue カタログ整備",
+      "結果出力先の管理"
+    ],
+    "costGotcha": "クエリのスキャン量で課金。列指向(Parquet)／パーティションでスキャンを減らす。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "スキャンしたデータ量"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 1,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "クエリ／定義は IaC 管理。",
+      "changeImpact": "スキーマ変更はカタログ側で管理。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/athena/",
+      "pricing": "https://aws.amazon.com/athena/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "glue",
+    "name": "AWS Glue",
+    "category": "analytics",
+    "tier": 1,
+    "oneLiner": "サーバーレスな ETL とデータカタログ。データの抽出・変換・統合と、メタデータの一元管理を行う。",
+    "mainUseCases": [
+      "ETL パイプライン",
+      "データカタログ（スキーマ管理）",
+      "データの探索／準備"
+    ],
+    "notSuitableFor": [
+      "リアルタイムの即時処理（→ Kinesis／Lambda）",
+      "単純な単発クエリ（→ Athena）"
+    ],
+    "companions": [
+      {
+        "serviceId": "s3",
+        "role": "入出力"
+      },
+      {
+        "serviceId": "athena",
+        "role": "カタログ共有"
+      },
+      {
+        "serviceId": "iam",
+        "role": "権限"
+      }
+    ],
+    "related": [
+      "s3",
+      "athena"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "iam",
+      "encryption"
+    ],
+    "productionPrereqs": [
+      "ジョブの DPU 設計",
+      "クローラ／カタログ整備",
+      "失敗時のリトライ／監視"
+    ],
+    "costGotcha": "DPU×実行時間で課金。クローラやジョブの実行頻度・規模に注意。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "DPU 時間",
+        "クローラ実行"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 3,
+      "ops": 2,
+      "org": 1
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "定義／スクリプトは IaC 管理。",
+      "changeImpact": "ジョブ更新は次回実行から反映。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/glue/",
+      "pricing": "https://aws.amazon.com/glue/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "guardduty",
+    "name": "Amazon GuardDuty",
+    "category": "security",
+    "tier": 1,
+    "oneLiner": "ログを継続分析して脅威（不正アクセス／マルウェア等）を自動検知するマネージドな脅威検知サービス。",
+    "mainUseCases": [
+      "不正アクセス／異常の検知",
+      "マルウェア／ランサム検知",
+      "コンテナ(EKS／ECS)環境の監視"
+    ],
+    "notSuitableFor": [
+      "予防／遮断そのもの（検知が主・対処は別サービス連携）",
+      "アプリのメトリクス監視"
+    ],
+    "companions": [
+      {
+        "serviceId": "cloudtrail",
+        "role": "分析データ源"
+      },
+      {
+        "serviceId": "cloudwatch",
+        "role": "アラート連携"
+      },
+      {
+        "serviceId": "s3",
+        "role": "ログ"
+      }
+    ],
+    "related": [
+      "cloudtrail",
+      "cloudwatch"
+    ],
+    "alternatives": [],
+    "commonRuleRefs": [
+      "logging",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "全リージョンで有効化",
+      "検知結果の通知／対応フロー",
+      "マルチアカウント集約"
+    ],
+    "costGotcha": "分析したログ量／イベント量で課金。データソースを広げると増える。",
+    "cost": {
+      "freeTier": true,
+      "meteredAxes": [
+        "分析ログ量",
+        "イベント量"
+      ],
+      "relative": "中"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "有効化／データソース変更は即時。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/guardduty/",
+      "pricing": "https://aws.amazon.com/guardduty/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
+  },
+  {
+    "id": "config",
+    "name": "AWS Config",
+    "category": "management",
+    "tier": 1,
+    "oneLiner": "AWS リソースの構成変更を継続記録し、あるべき状態（ルール）への準拠を評価するサービス。",
+    "mainUseCases": [
+      "構成変更の記録／追跡",
+      "コンプライアンス評価（ルール）",
+      "構成のトラブルシュート"
+    ],
+    "notSuitableFor": [
+      "API 操作の監査（→ CloudTrail）",
+      "アプリの性能監視（→ CloudWatch）"
+    ],
+    "companions": [
+      {
+        "serviceId": "cloudtrail",
+        "role": "操作との突合"
+      },
+      {
+        "serviceId": "s3",
+        "role": "設定スナップショット保管"
+      },
+      {
+        "serviceId": "sns",
+        "role": "通知"
+      }
+    ],
+    "related": [
+      "cloudtrail",
+      "cloudwatch"
+    ],
+    "alternatives": [
+      "cloudtrail"
+    ],
+    "commonRuleRefs": [
+      "logging",
+      "iam"
+    ],
+    "productionPrereqs": [
+      "記録対象リソースの選定",
+      "ルール（マネージド／カスタム）設定",
+      "是正アクション設計"
+    ],
+    "costGotcha": "記録した構成項目数＋ルール評価数で課金。対象を広げると増える。",
+    "cost": {
+      "freeTier": false,
+      "meteredAxes": [
+        "構成項目数",
+        "ルール評価数"
+      ],
+      "relative": "低"
+    },
+    "difficulty": {
+      "tech": 2,
+      "ops": 2,
+      "org": 2
+    },
+    "adoption": {
+      "region": {
+        "tokyo": true
+      },
+      "sla": "",
+      "lockin": "中",
+      "modernizeTo": []
+    },
+    "ops": {
+      "iacSupport": {
+        "terraform": true,
+        "cloudformation": true,
+        "cdk": true,
+        "cli": true
+      },
+      "backup": "設定は IaC 管理。",
+      "changeImpact": "記録範囲／ルール変更は即時。",
+      "failover": "マネージド。"
+    },
+    "links": {
+      "overview": "https://aws.amazon.com/config/",
+      "pricing": "https://aws.amazon.com/config/pricing/"
+    },
+    "realWorldNotes": [],
+    "updatedAt": "2026-06-27",
+    "verifiedAt": "2026-06-27"
   }
 ]
