@@ -1485,5 +1485,159 @@
         "role": "TLS 証明書"
       }
     ]
+  },
+  {
+    "id": "pat-data-governance",
+    "name": "データガバナンス（データレイク権限統制）",
+    "goal": "データレイクの権限を一元管理し、列・行・セル単位でアクセス制御する",
+    "recommendedStack": [
+      "lakeformation",
+      "glue",
+      "s3",
+      "athena",
+      "cloudtrail"
+    ],
+    "rationale": "Lake Formation が S3 上のデータと Glue データカタログのメタデータに対し、IAM を補完する独自の権限モデルで列・行・セル単位のアクセス制御を提供する。許可は Athena・Redshift Spectrum・EMR・Glue など分析サービス横断で適用され、CloudTrail で誰がいつ何にアクセスしたかを監査できる。タグ（LF-Tags）で多数のテーブル権限を集約でき、複数アカウント間の共有も一元管理しやすい。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "iam"
+        ],
+        "why": "多数の分析利用者へ列・行単位の制御を S3 バケットポリシーと IAM だけで行うと、ポリシーが膨張して統制を保ちにくくなりやすい。細粒度・横断の制御が要る場合は専用の権限レイヤーが向く。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "暗号化",
+      "監査ログ（CloudTrail）",
+      "タグ設計（権限の集約）"
+    ],
+    "optional": [
+      "Amazon Redshift（DWH 連携）",
+      "行・セル単位フィルタ（PII 保護）"
+    ],
+    "suitableConditions": [
+      "複数チーム・複数アカウントでデータを共有する",
+      "列・行・セル単位の制御が要る",
+      "PII など機微データを保護したい"
+    ],
+    "alternatives": [
+      "IAM＋S3 バケットポリシー（小規模・粗い粒度）",
+      "Amazon Redshift（DWH 内の権限管理）"
+    ],
+    "notes": "段階導入したい場合はハイブリッドアクセスモードで一部のテーブルから権限管理を始められる。小規模で粗い粒度の制御で足りるうちは IAM だけで済む場合もある。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "◎",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "◎",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "データ分析",
+      "監査／コンプライアンス"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "lakeformation",
+        "role": "権限の一元管理（列・行・セル）"
+      },
+      {
+        "serviceId": "glue",
+        "role": "データカタログ・ETL"
+      },
+      {
+        "serviceId": "s3",
+        "role": "データ保管"
+      },
+      {
+        "serviceId": "athena",
+        "role": "SQL クエリ（権限が適用される）"
+      },
+      {
+        "serviceId": "cloudtrail",
+        "role": "アクセス監査ログ"
+      }
+    ]
+  },
+  {
+    "id": "pat-hybrid-edge",
+    "name": "ハイブリッドエッジ（オンプレ内でローカル実行）",
+    "goal": "オンプレ拠点内で AWS と同じ基盤を動かし、低遅延・データ所在地の要件に応える",
+    "recommendedStack": [
+      "outposts",
+      "directconnect",
+      "vpc",
+      "ec2"
+    ],
+    "rationale": "Outposts は AWS のインフラ・API・ツールを顧客拠点へ延伸し、ローカルの compute／storage で低遅延処理や拠点内でのデータ処理を可能にする。Region との通信はサービスリンク、オンプレ網との通信はローカルゲートウェイが担う。Direct Connect で Region への接続を安定させ、拠点側で一貫した運用を実現する。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "outposts"
+        ],
+        "why": "ミリ秒単位の低遅延やデータ所在地といった明確な要件が無いのに専用ハードを置くと、コストと運用負荷が見合わなくなりやすい。要件が無ければ Region 利用が標準。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "物理サイト要件（設置・電源・回線）",
+      "ネットワーク設計（サービスリンク／ローカルゲートウェイ）",
+      "暗号化"
+    ],
+    "optional": [
+      "RDS on Outposts（拠点内 DB）",
+      "S3 on Outposts（拠点内オブジェクト保管）",
+      "ECS／EKS on Outposts（拠点内コンテナ）"
+    ],
+    "suitableConditions": [
+      "ミリ秒単位の低遅延が要る現場処理がある",
+      "データを拠点内に置く必要がある（所在地要件）",
+      "オンプレ設備と密に連携する"
+    ],
+    "alternatives": [
+      "AWS Local Zones（特定都市での低遅延）",
+      "Region 利用（要件が無ければ標準）"
+    ],
+    "notes": "各 Outpost は特定のアベイラビリティーゾーンの延伸であり、可用性は単一拠点に依存する。Region からの一部サービスは現地で動かせない点に注意。",
+    "difficulty": 4,
+    "evaluation": {
+      "security": "◎",
+      "availability": "△",
+      "opsLoad": "△",
+      "cost": "✕",
+      "scalability": "△",
+      "governanceFit": "◎",
+      "migrationEase": "○",
+      "vendorLockin": "✕"
+    },
+    "scenarioTags": [
+      "オンプレ移行",
+      "低遅延／データ所在地"
+    ],
+    "realWorldNotes": [],
+    "stackRoles": [
+      {
+        "serviceId": "outposts",
+        "role": "オンプレ拠点でのローカル実行基盤"
+      },
+      {
+        "serviceId": "directconnect",
+        "role": "Region への安定した専用接続"
+      },
+      {
+        "serviceId": "vpc",
+        "role": "拠点側サブネット（Region と同一 VPC）"
+      },
+      {
+        "serviceId": "ec2",
+        "role": "拠点内で動くアプリ"
+      }
+    ]
   }
 ]
