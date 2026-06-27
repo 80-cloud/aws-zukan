@@ -26,7 +26,8 @@
       "cost",
       "tagging",
       "iam-templates",
-      "tls-strategy"
+      "tls-strategy",
+      "deploy-audit"
     ],
     "cost": {
       "freeTier": true,
@@ -641,7 +642,8 @@
       "長期キーを機械に置かない"
     ],
     "commonRuleRefs": [
-      "iam"
+      "iam",
+      "deploy-audit"
     ],
     "cost": {
       "freeTier": true,
@@ -1798,7 +1800,8 @@
     "alternatives": [],
     "commonRuleRefs": [
       "iac-state",
-      "iam"
+      "iam",
+      "deploy-audit"
     ],
     "productionPrereqs": [
       "変更セット(change set)で差分確認",
@@ -3717,7 +3720,8 @@
     "alternatives": [],
     "commonRuleRefs": [
       "iam",
-      "iam-templates"
+      "iam-templates",
+      "deploy-audit"
     ],
     "productionPrereqs": [
       "各ステージの最小権限ロール",
@@ -3800,7 +3804,8 @@
     ],
     "alternatives": [],
     "commonRuleRefs": [
-      "iam"
+      "iam",
+      "deploy-audit"
     ],
     "productionPrereqs": [
       "ビルド環境／イメージの固定",
@@ -3888,7 +3893,8 @@
     "alternatives": [],
     "commonRuleRefs": [
       "iam",
-      "iam-templates"
+      "iam-templates",
+      "deploy-audit"
     ],
     "productionPrereqs": [
       "デプロイ設定（Blue/Green 等）",
