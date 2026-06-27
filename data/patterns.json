@@ -476,6 +476,13 @@
         ],
         "why": "自前で EC2 にコンテナを載せて運用すると、OS パッチ・スケール・監視の運用負荷が高くなりやすい。",
         "source": null
+      },
+      {
+        "stack": [
+          "ecs"
+        ],
+        "why": "非root ユーザーのコンテナでアプリを 80 番など 1024 未満の特権ポートに直接 bind させると、起動に失敗してタスクが上がらないことがある。3000 番台などで待ち受け、ALB/ターゲットグループ側でポートを対応付ける。",
+        "source": null
       }
     ],
     "requiredGovernance": [
@@ -514,7 +521,16 @@
       "外部公開アプリ",
       "オンプレ移行"
     ],
-    "realWorldNotes": [],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html",
+        "gotcha": "ALB 配下で起動の遅いアプリ（フレームワーク初期化に時間がかかる等）を動かすと、ヘルスチェックの grace period（healthCheckGracePeriodSeconds・既定0）が起動時間より短く、起動完了前に unhealthy 判定→タスク停止→再起動のループになりやすい。起動所要時間をカバーする値を設定する。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html",
+        "gotcha": "task definition の memory ハード上限を超えるとコンテナは即 kill。JVM 等の既定ヒープ／メタスペースが上限超過で OOM kill→再起動ループになりやすいので、ランタイムのメモリをコンテナ memory 内に収める。"
+      }
+    ],
     "stackRoles": [
       {
         "serviceId": "alb",
@@ -1295,6 +1311,90 @@
       {
         "serviceId": "iam",
         "role": "OIDC フェデレーション・最小権限ロール"
+      }
+    ]
+  },
+  {
+    "id": "pat-cloudfront-spa-api",
+    "name": "CloudFront 統合（SPA + API を1配信に同居）",
+    "goal": "SPA（静的）と API（動的）を1つの CloudFront 配信で同一ドメインから配信する",
+    "recommendedStack": [
+      "cloudfront",
+      "s3",
+      "alb"
+    ],
+    "rationale": "1つの CloudFront 配信で、静的な SPA（S3 オリジン）と動的な API（ALB オリジン）を同じドメインから配信する。パス（/ と /api/*）でビヘイビアを分け、SPA はキャッシュ、API は素通しにする。別ドメイン化に伴う CORS の管理を避けられる。",
+    "antiPatterns": [
+      {
+        "stack": [
+          "s3"
+        ],
+        "why": "動的な API まで S3 静的配信で済ませようとすると処理ができない。動的部分は ALB（または API Gateway）オリジンを別ビヘイビアで足す。",
+        "source": null
+      }
+    ],
+    "requiredGovernance": [
+      "オリジン間 HTTPS（ACM）",
+      "オリジンリクエストポリシー（API へ Cookie/認可ヘッダー転送）",
+      "アクセスログ"
+    ],
+    "optional": [
+      "WAF",
+      "CloudFront Functions / Lambda@Edge",
+      "route53 カスタムドメイン"
+    ],
+    "suitableConditions": [
+      "SPA と API を同一ドメインで出したい",
+      "CORS を避けたい",
+      "静的と動的を1配信でまとめたい"
+    ],
+    "alternatives": [
+      "S3 + CloudFront（静的のみ）",
+      "ALB 直結（CloudFront なし）"
+    ],
+    "notes": "SPA のフォールバックは 403/404 をカスタムエラーで /index.html に寄せるが、API パスまで HTML 化すると JSON parse エラーになるのでビヘイビアを分ける。/api/* には AllViewer 等のオリジンリクエストポリシーを当て、CloudFront→ALB は Origin Protocol Policy を HTTPS Only にする。",
+    "difficulty": 3,
+    "evaluation": {
+      "security": "○",
+      "availability": "◎",
+      "opsLoad": "○",
+      "cost": "○",
+      "scalability": "◎",
+      "governanceFit": "○",
+      "migrationEase": "○",
+      "vendorLockin": "△"
+    },
+    "scenarioTags": [
+      "外部公開アプリ",
+      "モバイル／SPA",
+      "外部公開サイト"
+    ],
+    "realWorldNotes": [
+      {
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-origin-requests.html",
+        "gotcha": "/api/* にオリジンリクエストポリシーを当てないと、Cookie や Authorization（JWT）がオリジンに届かず 401 になる。全部転送するなら AWS マネージドの AllViewer を使う。"
+      },
+      {
+        "source": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-custom-origin.html",
+        "gotcha": "Origin Protocol Policy を HTTPS Only にしないと、CloudFront とオリジン（ALB）間が HTTP 平文で流れることがある。本番前に HTTPS Only にする。"
+      }
+    ],
+    "stackRoles": [
+      {
+        "serviceId": "cloudfront",
+        "role": "配信の入口・パスでビヘイビア分割"
+      },
+      {
+        "serviceId": "s3",
+        "role": "SPA（静的）の配信元"
+      },
+      {
+        "serviceId": "alb",
+        "role": "API（動的）のオリジン"
+      },
+      {
+        "serviceId": "acm",
+        "role": "TLS 証明書"
       }
     ]
   }
